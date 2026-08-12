@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard Guide - SMS Expert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #ffffff;
+            --bg-sidebar: #f8f9fa;
+            --bg-card: rgba(0, 0, 0, 0.02);
+            --bg-card-hover: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --accent-purple: #8b5cf6;
+            --accent-violet: #a78bfa;
+            --accent-green: #10b981;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-logo span {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--accent-violet);
+            width: 100%;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            padding: 15px 25px 8px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--bg-card);
+            color: var(--accent-violet);
+            border-left-color: var(--accent-purple);
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-footer a:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 60px 50px 50px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-header h1 i {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 50px;
+        }
+
+        /* Section */
+        .guide-section {
+            margin-bottom: 60px;
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 35px;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(0,0,0,0.1);
+        }
+
+        .section-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-card h2 i {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--accent-violet);
+        }
+
+        .section-card > p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 25px;
+        }
+
+        .section-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 30px 0 15px;
+            color: var(--text-primary);
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-card h3:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 25px;
+        }
+
+        /* Screenshot Container */
+        .screenshot {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .screenshot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        .screenshot i {
+            font-size: 2.5rem;
+            color: var(--accent-violet);
+            margin-bottom: 15px;
+        }
+
+        .screenshot p {
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin: 10px 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .screenshot small {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .screenshot img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        /* Steps */
+        .steps {
+            list-style: none;
+            padding: 0;
+            counter-reset: step;
+        }
+
+        .steps li {
+            position: relative;
+            padding: 18px 20px 18px 70px;
+            margin-bottom: 12px;
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .steps li:hover {
+            background: rgba(0,0,0,0.03);
+            border-color: rgba(0,0,0,0.1);
+        }
+
+        .steps li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        /* Alert Boxes */
+        .alert-box {
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .alert-box i {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-box.tip {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-box.tip i { color: var(--accent-green); }
+
+        .alert-box.warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .alert-box.warning i { color: #fbbf24; }
+
+        .alert-box.info {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .alert-box.info i { color: var(--accent-purple); }
+
+        .alert-box-content strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .alert-box-content p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Tables */
+        .guide-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .guide-table th {
+            background: rgba(0,0,0,0.04);
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .guide-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .guide-table tr:hover td {
+            background: rgba(0,0,0,0.02);
+        }
+
+        /* Credentials Card */
+        .creds-card {
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .creds-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-violet);
+            margin-bottom: 15px;
+        }
+
+        .creds-card .cred-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
+        .creds-card .cred-row:last-child {
+            border-bottom: none;
+        }
+
+        .creds-card .cred-label {
+            width: 100px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .creds-card .cred-value {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            background: rgba(0,0,0,0.04);
+            padding: 5px 12px;
+            border-radius: 6px;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(0,0,0,0.03);
+            border-color: rgba(0,0,0,0.1);
+        }
+
+        .feature-item h5 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-item h5 i {
+            color: var(--accent-violet);
+        }
+
+        .feature-item p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-warning { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .badge-info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-header, .content-area {
+                padding: 30px;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="userguide.html" class="sidebar-logo">
+                <div class="sidebar-logo-icon"><i class="bi bi-chat-square-text-fill"></i></div>
+                <span>SMS Expert</span>
+            </a>
+            <div class="sidebar-badge">
+                <i class="bi bi-speedometer2"></i>
+                Customer Dashboard
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">Getting Started</div>
+            <a href="#overview" class="nav-link active"><i class="bi bi-grid"></i> Dashboard Overview</a>
+
+            <div class="nav-section">SMS Features</div>
+            <a href="#send-sms" class="nav-link"><i class="bi bi-chat-dots"></i> Send SMS</a>
+            <a href="#schedule-sms" class="nav-link"><i class="bi bi-calendar-event"></i> Schedule SMS</a>
+            <a href="#sent-sms" class="nav-link"><i class="bi bi-send-check"></i> Sent SMS</a>
+            <a href="#received-sms" class="nav-link"><i class="bi bi-inbox"></i> Received SMS</a>
+
+            <div class="nav-section">Management</div>
+            <a href="#keywords" class="nav-link"><i class="bi bi-tag"></i> Keywords</a>
+            <a href="#contacts" class="nav-link"><i class="bi bi-people"></i> Contacts & Groups</a>
+
+            <div class="nav-section">Billing</div>
+            <a href="#wallet" class="nav-link"><i class="bi bi-wallet2"></i> Wallet</a>
+            <a href="#buy-sms" class="nav-link"><i class="bi bi-cart"></i> Buy SMS</a>
+            <a href="#invoices" class="nav-link"><i class="bi bi-receipt"></i> Invoices</a>
+
+            <div class="nav-section">Account</div>
+            <a href="#profile" class="nav-link"><i class="bi bi-person"></i> Profile</a>
+        </nav>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>
+                <i class="bi bi-speedometer2"></i>
+                Customer Dashboard Guide
+            </h1>
+            <p>Complete guide for sending SMS, managing keywords, tracking messages, and handling your wallet.</p>
+        </div>
+
+        <div class="content-area">
+            <!-- Dashboard Overview -->
+            <section id="overview" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-grid"></i> Dashboard Overview</h2>
+                    <p>The main dashboard provides a comprehensive view of your SMS activity and wallet balance.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/dashboard-main.png" alt="Main Dashboard Screen" style="max-width:100%; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+                        <p>Main Dashboard Screen</p>
+                    </div>
+
+                    <h3>Dashboard Elements</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-bar-chart-fill"></i> SMS Statistics</h5>
+                            <p>View total sent, delivered, pending, and failed messages</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-wallet2"></i> Wallet Balance</h5>
+                            <p>Current balance display showing available funds</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-graph-up"></i> Trends</h5>
+                            <p>Charts showing SMS volume and spending patterns</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-geo-alt"></i> Top Destinations</h5>
+                            <p>Geographic breakdown of message destinations</p>
+                        </div>
+                    </div>
+
+                    <h3>Quick Statistics Overview</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Statistic</th>
+                                <th>Description</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Total Sent</strong></td>
+                                <td>Total number of SMS messages sent in selected period</td>
+                                <td>Top statistics bar</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Delivered</strong></td>
+                                <td>Messages confirmed delivered to recipients</td>
+                                <td>Top statistics bar</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pending</strong></td>
+                                <td>Messages awaiting delivery confirmation</td>
+                                <td>Top statistics bar</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Failed</strong></td>
+                                <td>Messages that could not be delivered</td>
+                                <td>Top statistics bar</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Wallet Balance</strong></td>
+                                <td>Current available credit for sending SMS</td>
+                                <td>Sidebar / Header</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Date Range Filters</h3>
+                    <p>Filter your dashboard statistics by selecting a custom date range:</p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-calendar-range"></i> Custom Range</h5>
+                            <p>Select specific start and end dates</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Tip</strong>
+                            <p>Use the date range filter at the top to analyze statistics for specific time periods. The dashboard auto-refreshes every 60 seconds to show the latest data.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Send SMS -->
+            <section id="send-sms" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-chat-dots"></i> Send SMS</h2>
+                    <p>Send individual or bulk SMS messages to your recipients.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/send-sms.png" alt="Send SMS Page">
+                        <p>Send SMS Page</p>
+                    </div>
+
+                    <h3>How to Send an SMS</h3>
+                    <ul class="steps">
+                        <li>Navigate to <strong>Send SMS</strong> from the sidebar menu</li>
+                        <li>Select your <strong>Sender ID</strong> from the dropdown</li>
+                        <li>Enter the <strong>recipient phone number(s)</strong> in international format</li>
+                        <li>Type your <strong>message</strong> in the text area</li>
+                        <li>Review the <strong>estimated cost</strong></li>
+                        <li>Click <strong>Send SMS</strong> to send immediately</li>
+                    </ul>
+
+                    <h3>Message Character Limits</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Message Type</th>
+                                <th>Characters per SMS</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Standard (GSM)</td>
+                                <td>160 characters</td>
+                                <td>Basic Latin characters, numbers</td>
+                            </tr>
+                            <tr>
+                                <td>Unicode</td>
+                                <td>70 characters</td>
+                                <td>Emojis, Arabic, Chinese, etc.</td>
+                            </tr>
+                            <tr>
+                                <td>Concatenated</td>
+                                <td>153/67 per part</td>
+                                <td>Long messages split into parts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Phone Number Formats</h3>
+                    <p>Enter recipient phone numbers in international format for best delivery rates:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Format</th>
+                                <th>Example</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>International with +</td>
+                                <td>+447700900123</td>
+                                <td><span class="badge badge-success">Recommended</span></td>
+                            </tr>
+                            <tr>
+                                <td>International without +</td>
+                                <td>447700900123</td>
+                                <td><span class="badge badge-success">Accepted</span></td>
+                            </tr>
+                            <tr>
+                                <td>Local format</td>
+                                <td>07700900123</td>
+                                <td><span class="badge badge-warning">May require country code</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Bulk SMS Entry</h3>
+                    <p>Send to multiple recipients by entering numbers in one of these formats:</p>
+                    <ul class="steps">
+                        <li><strong>One per line</strong> - Enter each phone number on a separate line</li>
+                        <li><strong>Comma separated</strong> - Enter numbers separated by commas (e.g., +447700900123,+447700900124)</li>
+                        <li><strong>Select from Groups</strong> - Choose a pre-saved contact group</li>
+                    </ul>
+
+                    <h3>Sender ID Options</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-phone"></i> Virtual Number</h5>
+                            <p>Use your assigned virtual number as sender ID - recipients can reply</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-building"></i> Alphanumeric ID</h5>
+                            <p>Use your brand name (up to 11 characters) - no replies possible</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-hash"></i> Shortcode</h5>
+                            <p>Use an assigned shortcode for promotional messages</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Important</strong>
+                            <p>Ensure sufficient wallet balance before sending. Each SMS part is charged separately. The cost is calculated before sending and displayed on screen.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Pro Tip</strong>
+                            <p>Watch the character counter as you type - it shows remaining characters and number of SMS parts your message will use.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Schedule SMS -->
+            <section id="schedule-sms" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-calendar-event"></i> Schedule SMS</h2>
+                    <p>Schedule messages to be sent at a specific date and time.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/schedule-sms.png" alt="Schedule Message section on the Send SMS page">
+                        <p>Schedule Message section on the Send SMS page</p>
+                    </div>
+
+                    <h3>How to Schedule an SMS</h3>
+                    <ul class="steps">
+                        <li>Go to <strong>Send SMS</strong> and fill in your message (recipients, sender and message text)</li>
+                        <li>In the <strong>Schedule Message</strong> section, set the <strong>date</strong> next to the "Send at" button</li>
+                        <li>Choose the <strong>hour</strong> and <strong>minute</strong> for delivery</li>
+                        <li>Click the <strong>Send at</strong> button to schedule the message</li>
+                    </ul>
+
+                    <h3>Scheduling Options</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Date Selection</strong></td>
+                                <td>Choose any future date from the calendar picker</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Time Selection</strong></td>
+                                <td>Set the exact hour and minute for delivery (24-hour format)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Managing Scheduled Messages</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-eye"></i> View Scheduled</h5>
+                            <p>See all pending scheduled messages in Sent SMS section</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Note</strong>
+                            <p>Scheduled messages are deducted from your wallet at the time of sending, not when scheduled. Your balance is checked again before the message is sent.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Sent SMS -->
+            <section id="sent-sms" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-send-check"></i> Sent SMS History</h2>
+                    <p>View all sent messages with delivery status information.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/sent-sms.png" alt="Sent SMS History">
+                        <p>Sent SMS History</p>
+                    </div>
+
+                    <h3>Delivery Status Codes</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-warning">Pending</span></td>
+                                <td>Message waiting for delivery confirmation</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-info">Sent</span></td>
+                                <td>Message accepted by the carrier</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">Delivered</span></td>
+                                <td>Message delivered to recipient</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-danger">Failed</span></td>
+                                <td>Message could not be delivered</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Message Details</h3>
+                    <p>Each sent message displays the following information:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Recipient</strong></td>
+                                <td>Phone number the message was sent to</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sender ID</strong></td>
+                                <td>The sender ID used for this message</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Message</strong></td>
+                                <td>Content of the SMS (click to expand full text)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Parts</strong></td>
+                                <td>Number of SMS parts used</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost</strong></td>
+                                <td>Amount deducted from wallet</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sent Time</strong></td>
+                                <td>Date and time message was sent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Delivered Time</strong></td>
+                                <td>Date and time message was delivered (if available)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Filtering & Search</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-search"></i> Search</h5>
+                            <p>Search by phone number or message content</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-calendar-range"></i> Date Range</h5>
+                            <p>Filter messages by date range</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-funnel"></i> Status Filter</h5>
+                            <p>Show only messages with specific status</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-download"></i> Export</h5>
+                            <p>Download history as CSV or Excel file</p>
+                        </div>
+                    </div>
+
+                    <h3>Common Delivery Failure Reasons</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Error</th>
+                                <th>Cause</th>
+                                <th>Solution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Invalid Number</td>
+                                <td>Phone number format is incorrect</td>
+                                <td>Verify number and use international format</td>
+                            </tr>
+                            <tr>
+                                <td>Number Not Reachable</td>
+                                <td>Phone is switched off or out of coverage</td>
+                                <td>Retry later or contact recipient</td>
+                            </tr>
+                            <tr>
+                                <td>Blocked</td>
+                                <td>Recipient has blocked SMS from sender</td>
+                                <td>Contact recipient through other means</td>
+                            </tr>
+                            <tr>
+                                <td>Blacklisted</td>
+                                <td>Number opted out (sent STOP)</td>
+                                <td>Cannot send - recipient must opt back in</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Tip</strong>
+                            <p>Use the Export feature to download your message history for record-keeping or analysis. Export includes all message details and delivery statuses.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Received SMS -->
+            <section id="received-sms" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-inbox"></i> Received SMS</h2>
+                    <p>View incoming SMS messages received on your keywords and virtual numbers.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/received-sms.png" alt="Received SMS Page">
+                        <p>Received SMS Page</p>
+                    </div>
+
+                    <h3>Inbox Details</h3>
+                    <p>Each received message shows the following information:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>From</strong></td>
+                                <td>Sender's phone number</td>
+                            </tr>
+                            <tr>
+                                <td><strong>To</strong></td>
+                                <td>Your virtual number or shortcode that received the message</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Keyword</strong></td>
+                                <td>The keyword matched (if applicable)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Message</strong></td>
+                                <td>Full text content of the received SMS</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Received Time</strong></td>
+                                <td>Date and time the message was received</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Managing Received Messages</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-reply"></i> Reply</h5>
+                            <p>Send a direct reply to the sender</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-search"></i> Search</h5>
+                            <p>Find messages by sender number or content</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-calendar-range"></i> Filter by Date</h5>
+                            <p>View messages from specific date range</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-download"></i> Export</h5>
+                            <p>Download received messages as CSV</p>
+                        </div>
+                    </div>
+
+                    <h3>Auto-Actions for Received SMS</h3>
+                    <p>Configure automatic actions through Keywords management:</p>
+                    <ul class="steps">
+                        <li><strong>Auto-Reply</strong> - Send an automatic response when a keyword is received</li>
+                        <li><strong>Email Forward</strong> - Forward incoming SMS to specified email addresses</li>
+                        <li><strong>SMS Forward</strong> - Forward incoming SMS to another phone number</li>
+                        <li><strong>Webhook</strong> - Send data to your application via HTTP POST</li>
+                    </ul>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Note</strong>
+                            <p>Received messages are stored for 90 days. Export important messages for long-term storage.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Keywords -->
+            <section id="keywords" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-tag"></i> Keywords Management</h2>
+                    <p>Manage your keywords, configure auto-responders, and set up forwarding rules.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/keywords-list.png" alt="Keywords List">
+                        <p>Keywords List</p>
+                    </div>
+
+                    <h3>Keyword Features</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-reply"></i> SMS Responder</h5>
+                            <p>Auto-reply to incoming SMS messages</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-envelope"></i> Email Forwarder</h5>
+                            <p>Forward SMS to email addresses</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-phone"></i> SMS Forwarder</h5>
+                            <p>Forward SMS to another phone</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-person-vcard"></i> Business Card</h5>
+                            <p>Send digital business cards</p>
+                        </div>
+                    </div>
+
+                    <h3>Creating a Keyword</h3>
+                    <ul class="steps">
+                        <li>Navigate to <strong>Keywords</strong> from the sidebar</li>
+                        <li>Click <strong>Create New Keyword</strong></li>
+                        <li>Enter your <strong>keyword text</strong> (e.g., INFO, HELP, JOIN)</li>
+                        <li>Select the <strong>virtual number</strong> to associate with</li>
+                        <li>Configure the <strong>action type</strong> (responder, forwarder, etc.)</li>
+                        <li>Save the keyword configuration</li>
+                    </ul>
+
+                    <h3>Keyword Action Types</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Description</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>SMS Responder</strong></td>
+                                <td>Automatically send a reply SMS when keyword is received</td>
+                                <td>Information requests, confirmations</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email Forwarder</strong></td>
+                                <td>Forward received SMS to one or more email addresses</td>
+                                <td>Lead capture, support tickets</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SMS Forwarder</strong></td>
+                                <td>Forward received SMS to another phone number</td>
+                                <td>Team notifications, alerts</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Webhook</strong></td>
+                                <td>Send message data to your application URL</td>
+                                <td>CRM integration, automation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Business Card</strong></td>
+                                <td>Send vCard with contact details</td>
+                                <td>Networking, contact sharing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Keyword Best Practices</h3>
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Tips for Effective Keywords</strong>
+                            <p>Use short, memorable keywords (3-8 characters). Avoid common words that might be accidentally triggered. Test your keyword setup before promoting it to customers.</p>
+                        </div>
+                    </div>
+
+                    <h3>Example Keyword Setups</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Keyword</th>
+                                <th>Action</th>
+                                <th>Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>INFO</td>
+                                <td>SMS Responder</td>
+                                <td>"Thank you for your interest! Visit our website at www.example.com for more details."</td>
+                            </tr>
+                            <tr>
+                                <td>STOP</td>
+                                <td>Opt-Out Handler</td>
+                                <td>"You have been unsubscribed. Text START to re-subscribe."</td>
+                            </tr>
+                            <tr>
+                                <td>SUPPORT</td>
+                                <td>Email Forwarder</td>
+                                <td>Forwards to support@company.com</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Contacts -->
+            <section id="contacts" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-people"></i> Contacts & Groups</h2>
+                    <p>Organize recipients into groups for easier bulk messaging.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/groups.png" alt="Groups Page">
+                        <p>Groups Page</p>
+                    </div>
+
+                    <h3>Creating a Group</h3>
+                    <ul class="steps">
+                        <li>Navigate to <strong>Groups</strong> from the sidebar</li>
+                        <li>Click <strong>Create New Group</strong></li>
+                        <li>Enter a group name and description</li>
+                        <li>Save the group</li>
+                        <li>Add contacts manually or via CSV upload</li>
+                    </ul>
+
+                    <h3>Adding Contacts to a Group</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-person-plus"></i> Manual Entry</h5>
+                            <p>Add individual contacts with phone, name, and custom fields</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-upload"></i> CSV Upload</h5>
+                            <p>Import contacts in bulk from a CSV file</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-copy"></i> Copy from Group</h5>
+                            <p>Duplicate contacts from an existing group</p>
+                        </div>
+                    </div>
+
+                    <h3>CSV Import Format</h3>
+                    <p>Your CSV file should follow this format:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Column</th>
+                                <th>Description</th>
+                                <th>Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>phone</code></td>
+                                <td>Phone number in international format</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>name</code></td>
+                                <td>Contact name for personalization</td>
+                                <td><span class="badge badge-warning">Optional</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>email</code></td>
+                                <td>Email address</td>
+                                <td><span class="badge badge-warning">Optional</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>custom1</code> - <code>custom5</code></td>
+                                <td>Custom fields for personalization</td>
+                                <td><span class="badge badge-warning">Optional</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Managing Groups</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>View Contacts</strong></td>
+                                <td>See all contacts in the group with search and filter options</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Edit Group</strong></td>
+                                <td>Change group name or description</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Export</strong></td>
+                                <td>Download all contacts as CSV file</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Delete Group</strong></td>
+                                <td>Remove group (contacts are not deleted from system)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Send to Group</strong></td>
+                                <td>Quick link to send SMS to all group members</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Contact Personalization</h3>
+                    <p>Use merge fields in your messages to personalize SMS for each recipient:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Merge Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>{name}</code></td>
+                                <td>Contact's name</td>
+                                <td>"Hello {name}" → "Hello John"</td>
+                            </tr>
+                            <tr>
+                                <td><code>{phone}</code></td>
+                                <td>Contact's phone number</td>
+                                <td>"Your number: {phone}"</td>
+                            </tr>
+                            <tr>
+                                <td><code>{custom1}</code></td>
+                                <td>Custom field 1</td>
+                                <td>Order number, appointment time, etc.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Pro Tip</strong>
+                            <p>Keep groups organized by purpose (e.g., "Customers", "Newsletter Subscribers", "Staff"). This makes campaign targeting easier and helps maintain compliance.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wallet -->
+            <section id="wallet" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-wallet2"></i> Wallet</h2>
+                    <p>View your current SMS wallet balance and manage your low-balance notification settings.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/wallet.png" alt="SMS Wallet">
+                        <p>SMS Wallet</p>
+                    </div>
+
+                    <h3>What You'll See</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-cash-stack"></i> Current SMS Wallet Balance</h5>
+                            <p>Your available funds for sending SMS</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-shield-check"></i> Minimum Balance</h5>
+                            <p>Set the threshold at which you want to be alerted</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-bell"></i> Notification Preferences</h5>
+                            <p>Daily email and immediate low-balance notifications</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Low Balance Alert</strong>
+                            <p>You will receive notifications when your balance falls below the minimum threshold. Configure your alert threshold in Profile settings.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Buy SMS -->
+            <section id="buy-sms" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-cart"></i> Buy SMS Credits</h2>
+                    <p>Purchase SMS credits to top up your wallet.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/buy-sms.png" alt="Buy SMS Page">
+                        <p>Buy SMS Page</p>
+                    </div>
+
+                    <h3>How to Purchase Credits</h3>
+                    <ul class="steps">
+                        <li>Navigate to <strong>Buy SMS</strong> from the sidebar</li>
+                        <li>Enter the <strong>amount</strong> you wish to purchase (minimum <strong>£100</strong>, + VAT)</li>
+                        <li>Click <strong>"Buy SMS"</strong> to generate your invoice</li>
+                        <li>Receive your <strong>invoice by email</strong> with payment instructions</li>
+                        <li>Complete payment by <strong>bank transfer</strong> (or card/PayPal up to your account limit)</li>
+                        <li>Once <strong>cleared funds</strong> are received, credits are added to your wallet (please allow up to 24 hours)</li>
+                    </ul>
+
+                    <h3>Payment Methods</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Processing Time</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>PayPal</strong></td>
+                                <td>Instant</td>
+                                <td>Secure payment via PayPal account or guest checkout</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Credit/Debit Card</strong></td>
+                                <td>Instant</td>
+                                <td>Visa, Mastercard, American Express accepted</td>
+                            </tr>
+                            <tr>
+                                <td><strong>BACS Transfer</strong></td>
+                                <td>1-3 Business Days</td>
+                                <td>UK bank transfer - reference number provided</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Invoice</strong></td>
+                                <td>On Receipt</td>
+                                <td>Available for approved business accounts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Pricing Information</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-currency-pound"></i> Per-SMS Pricing</h5>
+                            <p>Prices vary by destination country</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-percent"></i> Volume Discounts</h5>
+                            <p>Higher top-ups may qualify for discounts</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-shield-check"></i> No Expiry</h5>
+                            <p>Wallet credits do not expire</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-receipt"></i> VAT Included</h5>
+                            <p>All prices include applicable VAT</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Minimum Purchase</strong>
+                            <p>The minimum top-up amount is £100.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Tip</strong>
+                            <p>Contact your account manager for custom pricing on high-volume accounts. Volume pricing can significantly reduce your per-SMS costs.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invoices -->
+            <section id="invoices" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-receipt"></i> Invoices</h2>
+                    <p>View and download your billing invoices.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/invoices.png" alt="Invoices List">
+                        <p>Invoices List</p>
+                    </div>
+
+                    <h3>Invoice Information</h3>
+                    <p>Each invoice contains the following details:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Invoice Number</strong></td>
+                                <td>Unique reference number for the invoice</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Date</strong></td>
+                                <td>Invoice issue date</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Amount</strong></td>
+                                <td>Total invoice amount (including VAT)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status</strong></td>
+                                <td>Payment status (Paid or Unpaid)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Due Date</strong></td>
+                                <td>Payment due date for unpaid invoices</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Invoice Actions</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-eye"></i> View</h5>
+                            <p>View full invoice details online</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-download"></i> Download PDF</h5>
+                            <p>Download invoice as PDF document</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-envelope"></i> Email</h5>
+                            <p>Send invoice copy to your email</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-credit-card"></i> Pay Now</h5>
+                            <p>Pay outstanding invoices online</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Profile -->
+            <section id="profile" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-person"></i> Profile Settings</h2>
+                    <p>Manage your account information and preferences.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/profile.png" alt="Profile Page">
+                        <p>Profile Page</p>
+                    </div>
+
+                    <h3>Personal Information</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Full Name</strong></td>
+                                <td>Your name as it appears on communications</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email Address</strong></td>
+                                <td>Primary email for notifications and login</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone Number</strong></td>
+                                <td>Contact phone number for account verification</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Address</strong></td>
+                                <td>Billing address for invoices</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Company Details</h3>
+                    <p>Business account holders can configure:</p>
+                    <ul class="steps">
+                        <li><strong>Company Name</strong> - Business name for invoices</li>
+                        <li><strong>VAT Number</strong> - For VAT-registered businesses</li>
+                        <li><strong>Company Registration</strong> - Company registration number</li>
+                        <li><strong>Billing Contact</strong> - Separate contact for billing queries</li>
+                    </ul>
+
+                    <h3>Security Settings</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-key"></i> Change Password</h5>
+                            <p>Update your account password</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-shield-lock"></i> Two-Factor Auth</h5>
+                            <p>Enable 2FA for additional security</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-code-slash"></i> API Keys</h5>
+                            <p>Manage API access keys</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-clock-history"></i> Login History</h5>
+                            <p>View recent account access</p>
+                        </div>
+                    </div>
+
+                    <h3>Notification Preferences</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Notification</th>
+                                <th>Description</th>
+                                <th>Channels</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Low Balance Alert</strong></td>
+                                <td>Notify when wallet falls below threshold</td>
+                                <td>Email, SMS</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Delivery Reports</strong></td>
+                                <td>Summary of message delivery status</td>
+                                <td>Email</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Invoice Ready</strong></td>
+                                <td>New invoice available for download</td>
+                                <td>Email</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Campaign Complete</strong></td>
+                                <td>Notification when campaign finishes</td>
+                                <td>Email, SMS</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inbound SMS</strong></td>
+                                <td>Alert when new SMS is received</td>
+                                <td>Email</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Account Preferences</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-globe"></i> Timezone</h5>
+                            <p>Set timezone for scheduled messages</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-currency-exchange"></i> Currency</h5>
+                            <p>Display currency for pricing</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-calendar3"></i> Date Format</h5>
+                            <p>Preferred date/time format</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-translate"></i> Language</h5>
+                            <p>Interface language preference</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Important</strong>
+                            <p>Keep your email address up to date - it's used for password recovery and important account notifications.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Security Tip</strong>
+                            <p>Enable two-factor authentication for enhanced account security. This adds an extra layer of protection to your account.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // Active link highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Close sidebar on mobile when clicking a link
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    document.getElementById('sidebar').classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

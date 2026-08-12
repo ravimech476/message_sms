@@ -1,0 +1,348 @@
+APP_NAME=SMS_Expert
+APP_ENV=production
+APP_KEY=base64:hzB+xsH+k3N6nDrXYk3gY+srjYGdtkVpZaKhD6LzZrA=
+APP_DEBUG=true
+APP_TIMEZONE=Europe/London
+APP_URL=https://dashboard.smsexpert.co.uk/
+ADMIN_FULL_URL=https://admin.smsexpert.co.uk 
+
+# Domain Configuration
+CUSTOMER_DOMAINS=dashboard.smsexpert.co.uk,smsexpert
+ADMIN_DOMAINS=admin.smsexpert.co.uk,admin.smsexpert
+CUSTOMER_DOMAIN=dashboard.smsexpert.co.uk,smsexpert:8000
+ADMIN_DOMAIN=admin.smsexpert.co.uk,admin.smsexpert:8000
+CAMPAIGN_DOMAINS=campaign.smsexpert.co.uk,campaign.smsexpert
+CAMPAIGN_DOMAIN=campaign.smsexpert.co.uk,campaign.smsexpert:8000
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+APP_FAKER_LOCALE=en_US
+OLD_SMS_EXPERT_DASHBOARD_URL=https://www.itagg.com/platforme.net?itaggpage=login_process&user={username}&pass={password}&autologin=0&current_page=controlpanel
+OLD_SMS_EXPERT_CAMPAIGN_URL=https://www.itagg.com/accountmanager/index.php?usr={username}&pwd={password}&staffchangeusr=N2Y1YzNi&loginuser=DevTeam
+APP_MAINTENANCE_DRIVER=file
+# APP_MAINTENANCE_STORE=database
+
+BCRYPT_ROUNDS=12
+
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=139.162.241.84
+DB_PORT=3306
+DB_DATABASE=itaggprod
+DB_USERNAME=newsmsexpert
+DB_PASSWORD='UcwkpizyC90RK0V2hMX53K6Z1aXH'
+
+DB_CHARSET=utf8
+DB_COLLATION=utf8_general_ci
+
+#DB_CHARSET=utf8mb4
+#DB_COLLATION=utf8mb4_unicode_ci
+
+SMS_ASYNC_PUBLISH=true
+# SMPP-ONLY DLR (no paid Reports API): PERSISTENT-TRANSCEIVER mode. The smpp:dlr-receiver banks
+# SEND (drain sms.outbound) and RECEIVE the DLR on the SAME session, so Vonage returns every DLR to
+# the sender — no misses. Turn the separate sms_process_queue transmitter senders OFF in supervisor.
+SMPP_PERSISTENT_SEND=true
+# Leave this true or false — it only affects the (now-disabled) sms_process_queue workers; the banks
+# bind as transceiver when SMPP_PERSISTENT_SEND=true regardless.
+SMPP_SEND_TRANSMITTER_ONLY=true
+DLR_USE_BUFFER=true
+DLR_CALLBACK_PUBLISH=false
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
+
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+#QUEUE_CONNECTION=database
+QUEUE_CONNECTION=sync
+
+CACHE_STORE=redis
+CACHE_PREFIX=
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=log
+
+##MAIL_MAILER=smtp
+##MAIL_HOST=smtp.gmail.com
+##MAIL_PORT=587
+##MAIL_USERNAME=newdev-smtp-user@nedholdings.com
+##MAIL_PASSWORD='veve mcoz zmls elvo'
+##MAIL_ENCRYPTION=tls
+##MAIL_FROM_ADDRESS=do_not_reply@nedholdings.com
+##MAIL_FROM_NAME="${APP_NAME}"
+MAIL_MAILER=smtp
+MAIL_HOST=email-smtp.eu-west-1.amazonaws.com
+MAIL_PORT=465
+MAIL_USERNAME=AKIAVAT2X5VPTJ3CRGPH
+MAIL_PASSWORD=BNI9o9Eh70EmgMk5g8BEOl6zTGFEU8RHdhzvo25c0eVv
+MAIL_ENCRYPTION=TLS
+MAIL_FROM_ADDRESS=care@smsexpert.co.uk
+#MAIL_FROM_NAME="${APP_NAME}"
+MAIL_FROM_NAME="SMS Expert"
+
+
+MIGRATION_REPORT_EMAIL=anand@nedholdings.com
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+VONAGE_KEY=9f78e690
+VONAGE_SECRET=NYxE1hbzAKY4Gqf0
+VONAGE_SMS_FROM=YourSenderID
+
+VITE_APP_NAME="${APP_NAME}"
+
+
+VONAGE_SMS_FROM=sender_name
+
+
+# SMPP Configuration
+SMPP_HOST=smpp-eu.vonage.com
+SMPP_PORT=8000
+SMPP_SYSTEM_ID=c980a5f2
+SMPP_PASSWORD=6Fxtk0@SCNw^xn5akNSThjH
+SMPP_TYPE=smppBK1P3
+
+# SMPP Hosts (Vonage)
+SMPP_HOSTS="smpp-eu.vonage.com,smpp-eu-1.vonage.com,smpp-eu-2.vonage.com"
+SMPP_TPS_LIMIT=100
+SMPP_THROTTLE_MAX_RETRIES=5
+SMPP_BIND_TYPE=transceiver
+SMPP_TIMEOUT=30
+SMPP_KEEPALIVE=60
+RABBITMQ_SKIP_DURING_MIGRATION=true
+#  SMPP_HOSTS="smpp1.nexmo.com,smpp2.nexmo.com,smpp3.nexmo.com,smpp4.nexmo.com,smpp0.nexmo.com"
+SMPP_LOAD_BALANCING_MODE=round-robin
+SMPP_DLR_ENABLED=true
+DLR_WEBHOOK_URL=http://smsexpert:8000/api/smpp/dlr
+# RabbitMQ Configuration
+RABBITMQ_HOST=127.0.0.1
+RABBITMQ_PORT=5672
+RABBITMQ_USER=admin
+RABBITMQ_PASSWORD=SmSExpertRb2BQ
+RABBITMQ_VHOST=/
+RABBITMQ_ENABLED=true
+#Sinch
+SINCH_SMPP_HOST=eu.smpp.api.sinch.com
+SINCH_SMPP_PORT=3601
+SINCH_SMPP_SYSTEM_ID=SMSEx_RA
+SINCH_SMPP_PASSWORD=AyefPMkE
+SINCH_SMPP_SENDER=SMSEXPERT
+
+# RabbitMQ Queues
+RABBITMQ_SMS_QUEUE=sms.outbound
+RABBITMQ_DLR_QUEUE=sms.dlr
+RABBITMQ_FAILED_QUEUE=sms.failed
+RABBITMQ_PRIORITY_QUEUE=sms.priority
+RABBITMQ_INBOUND_QUEUE=sms.inbound
+RABBITMQ_CAMPAIGN_QUEUE=campaign.process
+RABBITMQ_NEXMO_DELIVERY_QUEUE=nexmo.delivery.reports
+
+# Delivery Receipt Configuration
+WHITE_LABEL_DEFAULT_IP=172.237.104.184
+DELIVERY_RECEIPT_DEFAULT_EMAIL=anand@nedholdings.com
+DELIVERY_RECEIPT_DEFAULT_NAME="${APP_NAME}"
+DELIVERY_RECEIPT_DEBUG=false
+
+#SINCH_NUMBERS_PROJECT_ID=e17e5427-0b4d-4c77-9339-9456a436046c
+#SINCH_NUMBERS_KEY_ID=3e21e1f9-f419-45ff-8938-c947b246e25f
+#SINCH_NUMBERS_KEY_SECRET=JVzWtzMQ8t1IaksXefR-DwaUd9
+SINCH_NUMBERS_PROJECT_ID=e17e5427-0b4d-4c77-9339-9456a436046c
+SINCH_NUMBERS_KEY_ID=3e21e1f9-f419-45ff-8938-c947b246e25f
+SINCH_NUMBERS_KEY_SECRET=JVzWtzMQ8t1IaksXefR-DwaUd9
+SINCH_NUMBERS_BASE_URL=https://numbers.api.sinch.com
+SINCH_INBOUND_WEBHOOK_URL=https://dashboard.smsexpert.co.uk/api/webhook/inbound-sms
+
+IMAP_HOST=imap.gmail.com
+IMAP_PORT=993
+IMAP_ENCRYPTION=ssl
+IMAP_USERNAME=newdev-smtp-user@nedholdings.com
+IMAP_PASSWORD=vevemcozzmlselvo
+IMAP_VALIDATE_CERT=true
+IMAP_PROCESSED_FOLDER=Processed
+IMAP_FAILED_FOLDER=Failed
+
+# Support Email for Bulk Throughput Warnings
+SUPPORT_EMAIL=anand@nedholdings.com
+
+# ==========================================
+# Exception Email Notification Configuration
+# ==========================================
+
+# Enable/disable exception email notifications (true/false)
+EXCEPTION_EMAIL_ENABLED=true
+
+# Comma-separated list of email addresses to receive exception notifications
+EXCEPTION_EMAIL_RECIPIENTS=anand@nedholdings.com
+
+# Only send exception emails in production/staging (true/false)
+EXCEPTION_EMAIL_ONLY_PRODUCTION=true
+
+# Maximum number of exception emails per minute (throttling)
+EXCEPTION_EMAIL_THROTTLE=5
+
+EXCEPTION_SMS_ENABLED=false
+
+EXCEPTION_SMS_RECIPIENTS=07777111111,07777222222
+
+# SMS sender ID/name (max 11 characters)
+EXCEPTION_SMS_SENDER=SMS_EXPERT
+
+# Only send SMS in production/staging (true/false)
+EXCEPTION_SMS_ONLY_PRODUCTION=true
+
+# SMS rate limiting - max number of exception SMS in time window
+EXCEPTION_SMS_THROTTLE_MINUTES=5
+EXCEPTION_SMS_THROTTLE_MAX=3
+
+# Skip SMS for these exception types (comma-separated)
+# EXCEPTION_SMS_SKIP_TYPES=AuthenticationException,ValidationException,TokenMismatchException
+
+# Nexmo/Vonage API Configuration
+NEXMO_API_KEY=9f78e690
+NEXMO_API_SECRET=NYxE1hbzAKY4Gqf0
+#NEXMO_API_KEY=23882cac
+#NEXMO_API_SECRET=6ElMVHmkcx3ACpxJ
+###################################################
+# Report Email Configuration
+REPORT_EMAIL_FROM=sms@sms.expert
+REPORT_EMAIL_FROM_NAME="SMS Expert"
+
+# Daily Stats Report Recipients (comma-separated)
+#REPORT_DAILY_STATS_RECIPIENTS=sms@sms.expert,stephenw@qadex.com,guna@qadex.com,jemma@qadex.com,care@smsexpert.co.uk
+REPORT_DAILY_STATS_RECIPIENTS=anand@nedholdings.com
+# Virtual Number Expiry Report Recipients (comma-separated)
+#REPORT_VIRTUAL_EXPIRY_RECIPIENTS=sms@sms.expert,care@smsexpert.co.uk
+REPORT_VIRTUAL_EXPIRY_RECIPIENTS=anand@nedholdings.com
+
+# Funds Alert Recipients (comma-separated)
+#REPORT_FUNDS_ALERT_RECIPIENTS=sms@sms.expert,alerts@sms.expert
+REPORT_FUNDS_ALERT_RECIPIENTS=anand@nedholdings.com
+
+# Wallet Reminder Admin Report Recipients (comma-separated)
+#REPORT_WALLET_REMINDER_ADMIN_RECIPIENTS=care@sms.expert,ayyanambalam@qadex.com
+REPORT_WALLET_REMINDER_ADMIN_RECIPIENTS=anand@nedholdings.com
+
+REPORT_SMPP_CHECKS_RECIPIENTS=anand@nedholdings.com
+
+# SMS Heartbeat Configuration
+HEARTBEAT_ENABLED=false
+HEARTBEAT_API_USER=heartbeat
+HEARTBEAT_API_PASSWORD=
+HEARTBEAT_ACCOUNT_BIGID=6641b01402fe76dd6656c16bc9c38700
+HEARTBEAT_DEFAULT_ROUTE=l
+
+# Heartbeat SIM Numbers
+HEARTBEAT_SIM_VODAFONE=447493870606
+HEARTBEAT_SIM_O2=447926477918
+HEARTBEAT_SIM_EE=447415523379
+HEARTBEAT_SIM_THREE=447479443491
+HEARTBEAT_SIM_ORANGE=447976606687
+
+# Heartbeat Alert Recipients (comma-separated)
+#HEARTBEAT_INTERNAL_RECIPIENTS=steve@itagg.com,sms@sms.expert
+HEARTBEAT_INTERNAL_RECIPIENTS=anand@nedholdings.com
+#HEARTBEAT_CLIENT_RECIPIENTS=steve@itagg.com
+HEARTBEAT_CLIENT_RECIPIENTS=anand@nedholdings.com
+
+# Pooled Virtuals Monitor Configuration
+POOLEDVIRTS_ENABLED=true
+#POOLEDVIRTS_ALERT_RECIPIENTS=sms@sms.expert,steve@itagg.com
+POOLEDVIRTS_ALERT_RECIPIENTS=anand@nedholdings.com
+POOLEDVIRTS_SWEEP_START_HOUR=2
+POOLEDVIRTS_SWEEP_END_HOUR=23
+POOLEDVIRTS_POOL_CHECK_HOUR=6
+POOLEDVIRTS_MAX_ITERATIONS=1000
+
+# URL Forward Daemon Configuration
+URLFORWARD_ENABLED=true
+URLFORWARD_DEFAULT_DAEMON=default
+URLFORWARD_DAEMONS=default
+#URLFORWARD_TIMEOUT_RECIPIENTS=urgent@itagg.com,sms@sms.expert
+URLFORWARD_TIMEOUT_RECIPIENTS=anand@nedholdings.com
+URLFORWARD_DEFAULT_TIMEOUT=15
+URLFORWARD_MAX_ROWS=100
+# Clients to notify on failure (comma-separated bigids)
+# d8fb91b0b3aa046ccc79b8d329fc568c = Chipside
+# agc4e32dfbs73dd32accqe52fa9c4a6a = Stagemount
+URLFORWARD_NOTIFY_CLIENTS=d8fb91b0b3aa046ccc79b8d329fc568c,agc4e32dfbs73dd32accqe52fa9c4a6a
+
+API_MONITOR_EMAIL_ENABLED=true
+API_MONITOR_EMAIL_RECIPIENTS=anand@nedholdings.com
+API_MONITOR_MAX_EMAILS_HOUR=10
+API_MONITOR_MIN_SEVERITY=high
+API_MONITOR_LOG_DATABASE=true
+API_MONITOR_RETENTION_DAYS=30
+
+PUSH_NOTIFICATIONS_ENABLED=true
+FCM_SERVER_KEY=your_fcm_server_key_here
+RABBITMQ_PUSH_QUEUE=push.notifications
+#SMPP_ENABLED=true
+#QUEUE_TEST_NUMBERS=917094514970
+SMPP_ENABLED=true
+#QUEUE_TEST_NUMBERS=917094514970,919025603512,919003096885
+DEFAULT_SMPP=true
+SMPP_REQUEST_TLV_PRICING=true
+SMPP_DEFAULT_SENDER=SMS_EXPERT
+SMPP_VONAGE_GLOBAL_SYSTEM_ID=c980a5f2
+SMPP_VONAGE_GLOBAL_PASSWORD=6Fxtk0@SCNw^xn5akNSThjH
+SMPP_VONAGE_PORT=8000
+SMPP_VONAGE_DIRECT_SYSTEM_ID=c980a5f2
+SMPP_VONAGE_DIRECT_PASSWORD=6Fxtk0@SCNw^xn5akNSThjH
+SMPP_THROTTLE_MBLOX=50
+SMPP_THROTTLE_VONAGE_GLOBAL=100
+SMPP_THROTTLE_VONAGE_DIRECT=100
+SMPP_THROTTLE_ROUTEMOBILE=100
+SMPP_THROTTLE_ICE=100
+SMPP_THROTTLE_TEK=100
+SMPP_SEQ_ID_STORAGE=database
+SMPP_ALERT_EMAIL=anand@nedholdings.com
+SMPP_LOG_LEVEL=debug
+RABBITMQ_MBLOX_SMS_QUEUE=sms.mblox.outbound
+RABBITMQ_MBLOX_DLR_QUEUE=sms.mblox.dlr
+RABBITMQ_MBLOX_INBOUND_QUEUE=sms.mblox.inbound
+RABBITMQ_WEBHOOK_DLR_QUEUE=webhook.dlr
+RABBITMQ_WEBHOOK_INBOUND_QUEUE=webhook.inbound
+CUSTOMER_SMPP_HOST=0.0.0.0
+CUSTOMER_SMPP_PORT=2775
+CUSTOMER_SMPP_PUBLIC_HOST=172.16.1.88
+CUSTOMER_SMPP_SYSTEM_ID=SMSEXPERT
+SINCH_SMPP_SYSTEM_TYPE=smppProd1
+SINCH_SMPP_PROFILE=21839
+SINCH_SMPP_PRIMARY_HOST=eu.smpp.api.sinch.com
+SINCH_SMPP_SECONDARY_HOST=eu.smpp.api.sinch.com
+SINCH_SMPP_SEQ_ID_MIN=1
+SINCH_SMPP_SEQ_ID_MAX=2000000
+SINCH_SMPP_TPS_LIMIT=50
+SINCH_SMPP_TIMEOUT=30
+SINCH_SMPP_KEEPALIVE=60
+SINCH_SMPP_RECV_TIMEOUT=10000
+SINCH_SMPP_BIND_TYPE=transceiver
+NEXMO_VN_API_KEY=df003a59
+NEXMO_VN_API_SECRET=cH7bWuTkAF5zXZ5Q
+SMPP_BANKS_ENABLED=true
+SINCH_BANKS_ENABLED=true
+SINCH_BANK_DEFAULT=a
+SMPP_HOST_1=smpp-eu.vonage.com
+SMPP_HOST_2=smpp-eu-1.vonage.com
+SMPP_HOST_3=smpp-eu-2.vonage.com
+SMPP_ALERT_ENABLED=true
+SMPP_ALERT_EMAIL=anand@nedholdings.com
+SMPP_ALERT_THROTTLE_MINUTES=15
+RABBITMQ_DLR_CALLBACK_QUEUE=dlr.callback.push
+

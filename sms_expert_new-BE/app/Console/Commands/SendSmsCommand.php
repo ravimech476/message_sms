@@ -1,0 +1,203 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Services\SMSService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+
+class SendSmsCommand extends Command
+{
+    protected $signature = 'sms:send';
+    protected $description = 'Send SMS messages from the database';
+
+    protected $smsService;
+
+    public function __construct(SMSService $smsService)
+    {
+        parent::__construct();
+        $this->smsService = $smsService;
+    }
+
+
+    public function handle()
+    {
+        // Fetch unsent SMS messages from the database
+        $messages = DB::table('smsg_log')->where('sentstatus', 'pending')
+        ->where('migration_flag', 'new')->get();
+
+        foreach ($messages as $message) {
+            // Check if the number is blacklisted
+            $normalizedNumber = ltrim($message->mobnum, '+');
+
+            $isBlacklisted = DB::table('itagg_outbound_blacklist')
+            ->where('msisdn', $normalizedNumber)
+            ->where('users_bigid', $message->userref)
+            ->exists();
+        
+        
+            if ($isBlacklisted) {
+                DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+                    'sentstatus' => 'fail',
+                    'timesent'   => Carbon::now('Europe/London')->format('YmdHis'),
+                    'sentstatustext' => 'Blacklisted Number',
+                    'deliverystatus2' => 'Non Delivered',  // OLD SYSTEM format
+                    'deliverytime2' => Carbon::now('Europe/London')->format('YmdHi'),  // GMT/UTC (display converts +1h BST)
+                ]);
+                $this->info('SMS not sent to blacklisted number ' . $message->mobnum);
+                Log::info('SMS not sent to blacklisted number ' . $message->mobnum);
+                continue;
+            }
+        
+            // 🔹 Check wallet balance
+            $user = DB::table('users')->where('bigid', $message->userref)->first();
+        
+            if (!$user || $user->smsg_wallet < 0.60) {
+                // Not enough funds
+                DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+                    'sentstatus' => 'fail',
+                    'timesent'   => Carbon::now('Europe/London')->format('YmdHis'),
+                    'sentstatustext' => 'Insufficient Balance',
+                    'deliverystatus2' => 'Non Delivered',  // OLD SYSTEM format
+                    'deliverytime2' => Carbon::now('Europe/London')->format('YmdHi'),  // GMT/UTC (display converts +1h BST)
+                ]);
+        
+                Log::warning("User {$message->userref} has insufficient balance. SMS not sent to {$message->mobnum}");
+                $this->warn("Insufficient balance for user {$message->userref}, SMS not sent.");
+                continue;
+            }
+        
+            // Send the SMS
+            $result = $this->smsService->sendSMS($message->mobnum, $message->text);
+        
+            if (isset($result['success'])) {
+                // Deduct wallet balance
+                // DB::table('users')->where('bigid', $message->userref)->decrement('smsg_wallet', 0.60);
+        
+                // Update log
+                DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+                    'sentstatus'       => 'ok',
+                    'timesent'         => Carbon::now('Europe/London')->format('YmdHis'),
+                    'sentstatustext'   => '',
+                    'onesixty_suppliermsgref' => $result['messageId'], // indexed match key == deliveryreceipt1
+                    'deliveryreceipt1' => $result['messageId'],
+                    'costprice'        => 0.00,
+                    'userprice'        => 0.00,
+                    'profit'           => 0.00,
+                ]);
+        
+                $this->info("Sent SMS to {$message->mobnum}");
+            } else {
+                // Failed sending
+                DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+                    'sentstatus'     => 'fail',
+                    'timesent'       => Carbon::now('Europe/London')->format('YmdHis'),
+                    'sentstatustext' => 'smsg_err :' . $result['error'],
+                    'onesixty_suppliermsgref' => $result['messageId'], // indexed match key == deliveryreceipt1
+                    'deliveryreceipt1' => $result['messageId'],
+                    'deliverystatus2' => 'Non Delivered',  // OLD SYSTEM format
+                    'deliverytime2' => Carbon::now('Europe/London')->format('YmdHi'),  // GMT/UTC (display converts +1h BST)
+                ]);
+        
+                Log::error("Failed to send SMS to {$message->mobnum}: " . $result['error']);
+                $this->error("Failed to send SMS to {$message->mobnum}: " . $result['error']);
+            }
+        }
+
+        Log::info('There is no SMS Pending');
+        $this->info('SMS sending process completed & There is no SMS Pending.');
+        
+
+        // foreach ($messages as $message) {
+        //     // Check if the number is blacklisted
+        //     $isBlacklisted = DB::table('itagg_outbound_blacklist')
+        //         ->where('msisdn', $message->mobnum)
+        //         ->exists();
+
+        //     if ($isBlacklisted) {
+        //         // Update the status to 'blocked' if the number is in the blacklist
+        //         DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+        //             'sentstatus' => 'fail',
+        //             'timesent' => Carbon::now('Europe/London')->format('YmdHis'),
+        //             'sentstatustext' => 'Blacklisted number',
+        //         ]);
+
+        //         $this->info('SMS not sent to blacklisted number ' . $message->mobnum);
+        //         Log::info('SMS not sent to blacklisted number ' . $message->mobnum);
+        //         continue; // Skip sending the SMS
+        //     }
+
+        //     // Send the SMS using the SMS service
+        //     $result = $this->smsService->sendSMS($message->mobnum, $message->text);
+
+        //     // Update the status in the database
+        //     if (isset($result['success'])) {
+
+        //         // Deduct from wallet (₹0.60 per SMS)
+        //         DB::table('users')->where('bigid', $message->userref)->decrement('smsg_wallet', 0.60);
+
+        //         // Update sent status
+        //         DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+        //             'sentstatus' => 'ok',
+        //             'timesent' => Carbon::now('Europe/London')->format('YmdHis'),
+        //             'sentstatustext' => 'sms sent',
+        //             'deliveryreceipt1' => $result['messageId'],
+        //             'costprice' => 0.35,
+        //             'userprice' => 0.60,
+        //             'profit' => 0.25,
+        //         ]);
+        //         $this->info('Sent SMS to ' . $message->mobnum);
+        //     } else {
+        //         // Update status to 'fail' and log the error if SMS sending failed
+        //         DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+        //             'sentstatus' => 'fail',
+        //             'timesent' => Carbon::now('Europe/London')->format('YmdHis'),
+        //             'sentstatustext' => 'smsg_err :' . $result['error'],
+        //         ]);
+
+        //         Log::error('Failed to send SMS to ' . $message->mobnum . ': ' . $result['error']);
+        //         $this->error('Failed to send SMS to ' . $message->mobnum . ': ' . $result['error']);
+        //     }
+        // }Log::info('There is no SMS Pending');
+        // Log::info('There is no SMS Pending');
+        // $this->info('SMS sending process completed & There is no SMS Pending.');
+    }
+
+
+    ### Cron Run Functionality
+    // public function handle()
+    // {
+    //     // Fetch unsent SMS messages from the database
+    //     $messages = DB::table('smsg_log')->where('sentstatus', 'pending')->get();
+
+    //     foreach ($messages as $message) {
+    //         // Send the SMS using the SMS service
+    //         $result = $this->smsService->sendSMS($message->mobnum, $message->text);
+
+    //         // Update the status in the database
+    //         if (isset($result['success'])) {
+    //             // Update sent status
+    //             DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+    //                 'sentstatus' => 'ok',
+    //                 'timesent' => Carbon::now('Europe/London')->format('YmdHis'),
+    //                 'sentstatustext' => 'sms sent',
+    //             ]);
+    //             $this->info('Sent SMS to ' . $message->mobnum);
+    //         } else {
+    //             DB::table('smsg_log')->where('bigid', $message->bigid)->update([
+    //                 'sentstatus' => 'fail',
+    //                 'timesent' => Carbon::now('Europe/London')->format('YmdHis'),
+    //                 'sentstatustext' => 'smsg_err :' . $result['error'],
+    //             ]);
+    //             // Log the error if the SMS failed to send
+    //             Log::error('Failed to send SMS to ' . $message->mobnum . ': ' . $result['error']);
+    //             $this->error('Failed to send SMS to ' . $message->mobnum . ': ' . $result['error']);
+    //         }
+    //     }
+
+    //     Log::info('There is no SMS Pending');
+    //     $this->info('SMS sending process completed & There is no SMS Pending.');
+    // }
+}

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Expert - Migration Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #ffffff;
+            --bg-card: rgba(0, 0, 0, 0.02);
+            --bg-card-hover: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-orange: #f97316;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-migration: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(234, 88, 12, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(251, 146, 60, 0.06) 0%, transparent 40%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        /* Header */
+        .main-header {
+            padding: 20px 0;
+            position: relative;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-migration);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: rgba(0,0,0,0.15);
+        }
+
+        .nav-link.highlight {
+            background: var(--gradient-migration);
+            border: none;
+            color: #fff;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 60px 30px 40px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent-orange);
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Content */
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 30px 100px;
+        }
+
+        /* Migration Flow Steps */
+        .flow-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .section-number {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-migration);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .section-title h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(249, 115, 22, 0.3);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.15));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--accent-orange);
+        }
+
+        .step-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .step-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .step-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .step-list li i {
+            color: var(--accent-orange);
+            margin-top: 4px;
+        }
+
+        /* Screenshot placeholder */
+        .screenshot-placeholder {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(234, 88, 12, 0.05));
+            border: 2px dashed rgba(249, 115, 22, 0.3);
+            border-radius: 16px;
+            padding: 60px 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .screenshot-placeholder i {
+            font-size: 3rem;
+            color: rgba(249, 115, 22, 0.4);
+            margin-bottom: 15px;
+        }
+
+        .screenshot-placeholder p {
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .screenshot-placeholder small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .screenshot-placeholder img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* API Change Section */
+        .api-change-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .api-change-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent-green);
+        }
+
+        .api-url-box {
+            background: rgba(0,0,0,0.03);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .api-url-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .api-url-label.old {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .api-url-label.new {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .api-url-value {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .arrow-down {
+            text-align: center;
+            padding: 10px;
+            color: var(--accent-green);
+            font-size: 1.5rem;
+        }
+
+        /* Info box */
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box h5 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent-blue);
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Warning box */
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box h5 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #f59e0b;
+        }
+
+        .warning-box p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Table */
+        .migration-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+        }
+
+        .migration-table th {
+            background: rgba(249, 115, 22, 0.1);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-orange);
+            border-bottom: 2px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .migration-table th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .migration-table th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .migration-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .migration-table tr:hover td {
+            background: var(--bg-card);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .status-badge.migrated {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .status-badge.failed {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .hero {
+                padding: 40px 20px 30px;
+            }
+
+            .content {
+                padding: 20px 15px 60px;
+            }
+
+            .step-card {
+                padding: 20px;
+            }
+
+            .api-url-box {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="nav-container">
+            <a href="userguide.html" class="logo">
+                <div class="logo-icon"><i class="bi bi-arrow-repeat"></i></div>
+                <span class="logo-text">SMS Expert Migration</span>
+            </a>
+            <nav class="nav-links">
+                <a href="userguide.html" class="nav-link"><i class="bi bi-arrow-left"></i> Back to Guides</a>
+                <a href="userguide-admin.html" class="nav-link"><i class="bi bi-shield-lock"></i> Admin Guide</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>API Migration Tool</span>
+        </div>
+        <h1>Customer Migration Guide</h1>
+        <p>Step-by-step guide to migrate customers from the old API to the new API endpoint. Same request format, only the URL changes.</p>
+    </section>
+
+    <!-- Content -->
+    <div class="content">
+
+        <!-- Step 1: Login -->
+        <div class="flow-section">
+            <div class="section-title">
+                <div class="section-number">1</div>
+                <h2>Login to Admin Panel</h2>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-icon"><i class="bi bi-box-arrow-in-right"></i></div>
+                    <h3>Access Migration Portal</h3>
+                </div>
+                <div class="step-content">
+                    <p>Log in to the Admin Panel using your admin credentials. Once logged in, navigate to the Migration section from the sidebar menu.</p>
+                    <ul class="step-list">
+                        <li><i class="bi bi-check-circle-fill"></i> Go to <strong><a href="https://admin.smsexpert.co.uk/" target="_blank" style="color: var(--accent-orange);">https://admin.smsexpert.co.uk/</a></strong></li>
+                        <li><i class="bi bi-check-circle-fill"></i> Enter your admin username and password</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Click on <strong>Customers</strong> in the sidebar menu</li>
+                    </ul>
+                </div>
+                <div class="screenshot-placeholder">
+                    <img src="userguide-screenshots/migration-login.png" alt="Admin Login Page">
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Select Customer and View Migration Tab -->
+        <div class="flow-section">
+            <div class="section-title">
+                <div class="section-number">2</div>
+                <h2>Select Customer</h2>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-icon"><i class="bi bi-people"></i></div>
+                    <h3>Choose Customer to Migrate</h3>
+                </div>
+                <div class="step-content">
+                    <p>Select a customer from the list and navigate to the Migration tab to update their API endpoint.</p>
+                    <ul class="step-list">
+                        <li><i class="bi bi-check-circle-fill"></i> View the list of all customers</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Click the <strong>View</strong> button on the customer you want to migrate</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Click on the <strong>Migration</strong> tab in the customer details page</li>
+                    </ul>
+                </div>
+                <div class="screenshot-placeholder">
+                    <img src="userguide-screenshots/migration-select-customers.png" alt="Customer List - Click View Button">
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Migration Table -->
+        <div class="flow-section">
+            <div class="section-title">
+                <div class="section-number">3</div>
+                <h2>Migration Table</h2>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-icon"><i class="bi bi-table"></i></div>
+                    <h3>Review Migration Status</h3>
+                </div>
+                <div class="step-content">
+                    <p>The Migration Tab shows the current migration flag status for the customer.</p>
+                </div>
+                <div class="screenshot-placeholder">
+                    <img src="userguide-screenshots/migration-table.png" alt="Migration Table View">
+                </div>
+
+                <div class="step-header" style="margin-top: 30px;">
+                    <div class="step-icon"><i class="bi bi-clock-history"></i></div>
+                    <h3>Migration History</h3>
+                </div>
+                <div class="step-content">
+                    <p>Once the migration is completed, the system will display a history list showing all migration records for the customer.</p>
+                </div>
+                <div class="screenshot-placeholder">
+                    <img src="userguide-screenshots/migration-history.png" alt="Migration History List">
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: API URL Change -->
+        <div class="flow-section">
+            <div class="section-title">
+                <div class="section-number">4</div>
+                <h2>API URL Change</h2>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-icon"><i class="bi bi-link-45deg"></i></div>
+                    <h3>New API Endpoint</h3>
+                </div>
+                <div class="step-content">
+                    <p>After migration, customers need to update their API URL. The request format remains exactly the same - only the URL changes.</p>
+                </div>
+
+                <div class="api-change-card">
+                    <h4><i class="bi bi-arrow-left-right"></i> API URL Change</h4>
+
+                    <div class="api-url-box">
+                        <span class="api-url-label old">OLD URL</span>
+                        <span class="api-url-value" id="old-api-url"></span>
+                    </div>
+
+                    <div class="arrow-down">
+                        <i class="bi bi-arrow-down-circle-fill"></i>
+                    </div>
+
+                    <div class="api-url-box">
+                        <span class="api-url-label new">NEW URL</span>
+                        <span class="api-url-value" id="new-api-url"></span>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 20px;">
+                        <h5><i class="bi bi-info-circle-fill"></i> Same Request Format</h5>
+                        <p>The request body, headers, and parameters remain exactly the same. Only the base URL needs to be updated in the customer's integration.</p>
+                    </div>
+                </div>
+
+                </div>
+        </div>
+
+        <!-- Step 5: Customer Access URLs -->
+        <div class="flow-section">
+            <div class="section-title">
+                <div class="section-number">5</div>
+                <h2>Customer Access URLs</h2>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-icon"><i class="bi bi-globe"></i></div>
+                    <h3>New Domain Access</h3>
+                </div>
+                <div class="step-content">
+                    <p>After migration, customers will be able to access the new domain only. Share these URLs with migrated customers:</p>
+
+                    <div class="api-change-card">
+                        <h4><i class="bi bi-link-45deg"></i> Customer Access URLs</h4>
+
+                        <div class="api-url-box">
+                            <span class="api-url-label new">DASHBOARD</span>
+                            <span class="api-url-value"><a href="https://dashboard.smsexpert.co.uk" target="_blank" style="color: var(--accent-green);">https://dashboard.smsexpert.co.uk</a></span>
+                        </div>
+
+                        <div class="api-url-box">
+                            <span class="api-url-label new">CAMPAIGN</span>
+                            <span class="api-url-value"><a href="https://campaign.smsexpert.co.uk" target="_blank" style="color: var(--accent-green);">https://campaign.smsexpert.co.uk</a></span>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 20px;">
+                        <h5><i class="bi bi-info-circle-fill"></i> Important</h5>
+                        <p>Once a customer is migrated, if they try to access the old URL, they will be automatically redirected to the new URL.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 SMS Expert. All rights reserved. | <a href="userguide.html">Back to User Guide</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Get current domain dynamically
+        const currentDomain = window.location.hostname;
+        const currentProtocol = window.location.protocol;
+        const baseUrl = currentProtocol + '//' + currentDomain;
+
+        // Update all elements with current domain
+        document.querySelectorAll('.current-domain').forEach(el => {
+            el.textContent = currentDomain;
+        });
+
+        // Update API URLs
+        const oldApiUrl = document.getElementById('old-api-url');
+        const newApiUrl = document.getElementById('new-api-url');
+
+        if (oldApiUrl) {
+            oldApiUrl.textContent = 'https://secure.itagg.com/smsg/sms.mes';
+        }
+        if (newApiUrl) {
+            newApiUrl.textContent = 'https://dashboard.smsexpert.co.uk/api/smsg/sms.mes';
+        }
+    </script>
+</body>
+</html>

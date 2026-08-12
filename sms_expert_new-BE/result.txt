@@ -1,0 +1,201 @@
+  SELECT bigid, uname, `1s_preferredroute`, preferredroute2, preferredroute3,
+         migration_flag, userpause
+  FROM users
+  WHERE bigid = '840b33214cf157e10e558f59f06189e7' OR uname = 'arunestates'
+
+#	bigid	uname	1s_preferredroute	preferredroute2	preferredroute3	migration_flag	userpause
+1	840b33214cf157e10e558f59f06189e7	arunestates	7002	0	0	old	n
+
+
+
+
+
+
+
+
+ SELECT COUNT(*) AS rate_rows FROM smsg_userroute WHERE userref = '840b33214cf157e10e558f59f06189e7'
+
+#	rate_rows
+1	48
+
+
+
+
+
+SELECT routenum, countrydialcode, numbits, origtype, userprice, priority, username
+  FROM smsg_userroute
+  WHERE userref = '840b33214cf157e10e558f59f06189e7'
+  ORDER BY routenum, countrydialcode, numbits, origtype
+#	routenum	countrydialcode	numbits	origtype	userprice	priority	username
+1	8	all	7	alpha	0.060000	9999	special rate for specific user r8
+2	8	all	7	msisdn	0.060000	9999	special rate for specific user r8
+3	8	all	7	shortcode	0.060000	9999	special rate for specific user r8
+4	8	all	8	alpha	0.060000	9999	special rate for specific user r8
+5	8	all	8	msisdn	0.060000	9999	special rate for specific user r8
+6	8	all	8	shortcode	0.060000	9999	special rate for specific user r8
+7	51	44	7	alpha	0.020000	1	special rate users
+8	51	44	7	msisdn	0.020000	1	special rate users
+9	54	44	7	alpha	0.020000	1	special rate users
+10	54	44	7	msisdn	0.020000	1	special rate users
+11	55	44	7	alpha	0.020000	1	special rate users
+12	55	44	7	msisdn	0.020000	1	special rate users
+13	7002	44	7	alpha	0.029100	1	special rate users
+14	7002	44	7	msisdn	0.029100	1	special rate users
+15	7002	44	7	shortcode	0.029100	1	special rate users
+16	7002	44	8	alpha	0.029100	1	special rate users
+17	7002	44	8	msisdn	0.029100	1	special rate users
+18	7002	44	8	shortcode	0.029100	1	special rate users
+19	7003	44	7	alpha	0.019000	1	special rate users
+20	7003	44	7	msisdn	0.019000	1	special rate users
+21	7003	44	7	shortcode	0.019000	1	special rate users
+22	7003	44	8	alpha	0.019000	1	special rate users
+23	7003	44	8	msisdn	0.019000	1	special rate users
+24	7003	44	8	shortcode	0.019000	1	special rate users
+25	7009	44	7	alpha	0.019000	1	special rate users
+26	7009	44	7	msisdn	0.019000	1	special rate users
+27	7009	44	7	shortcode	0.019000	1	special rate users
+28	7009	44	8	alpha	0.019000	1	special rate users
+29	7009	44	8	msisdn	0.019000	1	special rate users
+30	7009	44	8	shortcode	0.019000	1	special rate users
+31	7029	44	7	alpha	0.029100	1	special rate users
+32	7029	44	7	msisdn	0.029100	1	special rate users
+33	7029	44	7	shortcode	0.029100	1	special rate users
+34	7029	44	8	alpha	0.029100	1	special rate users
+35	7029	44	8	msisdn	0.029100	1	special rate users
+36	7029	44	8	shortcode	0.029100	1	special rate users
+37	8002	44	7	alpha	0.016000	1	special rate users
+38	8002	44	7	msisdn	0.016000	1	special rate users
+39	8002	44	7	shortcode	0.016000	1	special rate users
+40	8002	44	8	alpha	0.016000	1	special rate users
+41	8002	44	8	msisdn	0.016000	1	special rate users
+42	8002	44	8	shortcode	0.016000	1	special rate users
+43	8029	44	7	alpha	0.016000	1	special rate users
+44	8029	44	7	msisdn	0.016000	1	special rate users
+45	8029	44	7	shortcode	0.016000	1	special rate users
+46	8029	44	8	alpha	0.016000	1	special rate users
+47	8029	44	8	msisdn	0.016000	1	special rate users
+48	8029	44	8	shortcode	0.016000	1	special rate users
+
+
+
+
+  SELECT routenum, countrydialcode, numbits, origtype, userprice
+  FROM smsg_userroute
+  WHERE userref = '840b33214cf157e10e558f59f06189e7' AND ROUND(userprice,4) = 0.0291;
+
+#	routenum	countrydialcode	numbits	origtype	userprice
+1	7029	44	8	shortcode	0.029100
+2	7029	44	8	msisdn	0.029100
+3	7029	44	8	alpha	0.029100
+4	7029	44	7	shortcode	0.029100
+5	7029	44	7	msisdn	0.029100
+6	7029	44	7	alpha	0.029100
+7	7002	44	8	shortcode	0.029100
+8	7002	44	8	msisdn	0.029100
+9	7002	44	8	alpha	0.029100
+10	7002	44	7	shortcode	0.029100
+11	7002	44	7	msisdn	0.029100
+12	7002	44	7	alpha	0.029100
+
+
+
+
+
+ SELECT ur.userprice, r.costprice, r.suppliername
+  FROM smsg_userroute ur
+  LEFT JOIN smsg_route r
+         ON ur.routenum = r.routenum
+        AND (r.countrydialcode = '44' OR r.countrydialcode = 'all' OR r.countrydialcode IS NULL)
+  WHERE ur.userref = '840b33214cf157e10e558f59f06189e7'
+    AND ur.routenum = 7
+    AND (ur.countrydialcode = '44' OR ur.countrydialcode = 'all')
+    AND ur.numbits = 7
+    AND ur.origtype = 'alpha'
+  ORDER BY ur.priority DESC
+  LIMIT 1;
+
+Query OK — 0 rows returned.
+
+
+
+SELECT routenum, countrydialcode, numbits, origtype, userprice
+  FROM smsg_userroute
+  WHERE userref = '11111111111111111111111111111111'
+    AND countrydialcode IN ('44','all')
+    AND routenum IN (7, 7002)
+  ORDER BY routenum, numbits, origtype;
+#	routenum	countrydialcode	numbits	origtype	userprice
+1	7002	all	7	alpha	0.060000
+2	7002	44	7	alpha	0.035000
+3	7002	44	7	msisdn	0.035000
+4	7002	all	7	msisdn	0.060000
+5	7002	44	7	shortcode	0.035000
+6	7002	all	7	shortcode	0.060000
+7	7002	44	8	alpha	0.035000
+8	7002	all	8	alpha	0.060000
+9	7002	44	8	msisdn	0.035000
+10	7002	all	8	msisdn	0.060000
+11	7002	all	8	shortcode	0.060000
+12	7002	44	8	shortcode	0.035000
+
+
+
+ SELECT bigid, mobnum, originator, numbits, numparts, requested_route,
+         costprice, userprice, sentstatus, sentstatustext, timesubmitted
+  FROM smsg_log
+  WHERE userref = ''840b33214cf157e10e558f59f06189e7''
+    AND timesubmitted LIKE '20260714%'
+  ORDER BY timesubmitted DESC
+  LIMIT 50;
+
+#	bigid	mobnum	originator	numbits	numparts	requested_route	costprice	userprice	sentstatus	sentstatustext	timesubmitted
+1	d71934d1df3188fadb2b704987c78c89	447910340113	Wards	7	1	7002	0.016500	0.029100	ok		20260714115236
+2	6235f1dcb21e8635a28733bae15a11db	447398101285	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115130
+3	6eefe44f1c5e400e6a9d393781d9ede8	447756613030	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115130
+4	e4e53d53924457f0f811af1c3008e203	447429183469	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115129
+5	e8884fd3e1d97b39c8f6943f19a9580a	447800654335	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115129
+6	d52b6d3b8df7f9f67ffce68243427d83	447731355905	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115129
+7	f92864c645670523426eae413c348021	447401175320	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115129
+8	44c0df776d6ea58a3bf8c06ea389995b	447533350699	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115129
+9	386425597ea47c64368c6cacdba09ffd	447477024623	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115129
+10	366eb0398775e700547f57b2599cbcc3	447429097174	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115128
+11	b2433f924d89fb361574051c0e8d73cb	447738713833	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115128
+12	b013a6c90bdf850ad5efdc22e41be8a9	447725742091	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115128
+13	565adec4d5f1977870d84b2fbe049119	447938548512	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115128
+14	fc2eefaa35a340e4c1567bc6090b28aa	447379224471	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115128
+15	b34c6742b695c7a9bd9b72a4f1a5b224	447538710887	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115128
+16	24e21601316373bcc67920475b95735d	447792506532	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115128
+17	1df866af5b95c2a167a9787bc8b6ce0b	447747235394	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+18	d54b6d10662a895dd36561612c829d03	447855985460	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+19	82400638072a8c76b99f8d143cfa44ac	447505479802	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+20	c6401b22302eadca2d787a095c0d9edd	447894416627	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+21	6be548d94eb8871a660bb8dcdfbe89c7	447968375372	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+22	601ad431144ba8b946b8a57adf3e669a	447821735461	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+23	cdc3dc5d8fc734c450d6401080e1892a	447508587918	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+24	a769d4a6e72de610d943f8b1c44696de	447504666208	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115127
+25	2cd0aa9cea3994695669866c2b56f56c	447584056797	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115126
+26	ef57108f3baf287a6d2398d3774d44d1	447763753176	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115126
+27	ab5b709549f53cf2ce28e0cb20e6693b	447740368822	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115126
+28	94bdd5b2b6c56abbbae0cb13a1ab50b1	447530721399	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115126
+29	0201f7556b26428abb2f3b2fd2c69783	447943139260	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115126
+30	48a5efa6dc051dd4e5f0f083b119a7b2	447904116061	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115126
+31	4afd5e0e300c5bb0d3aab41d19e74438	447850495564	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115126
+32	e8800e54db3ac07e8d46105ebae6b31f	447796388875	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115125
+33	34f6395170dabfbdd78bb175f86c93c1	447780357170	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115125
+34	22937f82fa0bfa7e0a2d2d748af7e8fb	447767914339	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115125
+35	9403dda4be97c1781f741804335bc428	447757797611	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115125
+36	9ab8f30cd79b6ef86cc7bbfc24f34bf6	447551580607	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115125
+37	2816e71e2c0ab356a41f2bcd9d915342	447533176674	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115125
+38	951b738c8da52328cdd5aaa03c63b2dc	447403232766	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115125
+39	fe530aeca3ecbacb344f031fe6432e12	447403232765	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115124
+40	6a572450dbf181671a736dc86d997586	447378171700	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115124
+41	ce8660fd2454485630dbfeeaa83b6c54	447474027482	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115124
+42	452ef6c154a1ef2daa6bafdcb892370e	447737040383	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115124
+43	e86e0c6370be8213abdc60440823cf49	447469654574	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115124
+44	44c5804980a946cc52f32c5d48f54321	447947163018	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115124
+45	57908b28ae3268f1260254fb7e7aecb1	447944676285	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115124
+46	b0bfca0476e8e4c92074db9ff7c0d83b	447743518572	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115123
+47	a8f2eab2067f3c34a9d1756449140ab3	447742795136	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115123
+48	be940d0809f8f7f2d443206f76b5cac0	447593500431	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115123
+49	3f120d5f67fd0a848b0a9999adefec6d	447704247698	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115123
+50	7070de29fd5b016d2a59247423539553	447932638537	Cubitt+West	7	1	7002	0.000000	0.000000	no		20260714115123

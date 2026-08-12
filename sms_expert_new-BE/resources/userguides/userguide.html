@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Expert - User Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #ffffff;
+            --bg-card: rgba(0, 0, 0, 0.02);
+            --bg-card-hover: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.06) 0%, transparent 40%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        /* Grid Pattern Overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        /* Header */
+        .main-header {
+            padding: 20px 0;
+            position: relative;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: rgba(0,0,0,0.15);
+        }
+
+        .nav-link.highlight {
+            background: var(--gradient-1);
+            border: none;
+            color: #fff;
+        }
+
+        .nav-link.highlight:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 30px 80px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .hero-badge i {
+            color: var(--accent-green);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #4a4a6a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero.primary {
+            background: var(--gradient-1);
+            color: #fff;
+        }
+
+        .btn-hero.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-hero.secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-hero.secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(0,0,0,0.15);
+        }
+
+        /* Platform Cards */
+        .platforms {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 30px 100px;
+        }
+
+        .section-label {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-label span {
+            display: inline-block;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .platform-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 35px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .platform-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .platform-card.dashboard::before { background: var(--gradient-1); }
+        .platform-card.campaign::before { background: var(--gradient-2); }
+        .platform-card.admin::before { background: var(--gradient-3); }
+        .platform-card.migration::before { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+
+        .platform-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(0,0,0,0.12);
+            transform: translateY(-8px);
+        }
+
+        .platform-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .platform-card.dashboard .card-icon {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            color: #a78bfa;
+        }
+
+        .platform-card.campaign .card-icon {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2));
+            color: #f472b6;
+        }
+
+        .platform-card.admin .card-icon {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2));
+            color: #22d3ee;
+        }
+
+        .platform-card.migration .card-icon {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.2));
+            color: #f97316;
+        }
+
+        .card-url {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(0,0,0,0.04);
+            border-radius: 8px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .card-url i {
+            font-size: 0.7rem;
+        }
+
+        .platform-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .platform-card > p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li i {
+            color: var(--accent-green);
+            font-size: 0.8rem;
+        }
+
+        .card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .platform-card.dashboard .card-btn {
+            background: var(--gradient-1);
+            color: #fff;
+        }
+
+        .platform-card.campaign .card-btn {
+            background: var(--gradient-2);
+            color: #fff;
+        }
+
+        .platform-card.admin .card-btn {
+            background: var(--gradient-3);
+            color: #fff;
+        }
+
+        .platform-card.migration .card-btn {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: #fff;
+        }
+
+        .card-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: #fff;
+        }
+
+        /* Performance Section */
+        .performance-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px 100px;
+        }
+
+        .performance-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .performance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+        }
+
+        .performance-content {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .performance-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--accent-green);
+            flex-shrink: 0;
+        }
+
+        .performance-info {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .performance-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .performance-info p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .performance-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-performance {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-performance:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+            color: #fff;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .hero {
+                padding: 60px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .platform-card {
+                padding: 25px;
+            }
+
+            .credentials-card {
+                padding: 25px;
+            }
+
+            .credentials-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .performance-card {
+                padding: 25px;
+            }
+
+            .performance-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .performance-stats {
+                justify-content: center;
+            }
+
+            .btn-performance {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="nav-container">
+            <a href="userguide.html" class="logo">
+                <div class="logo-icon"><i class="bi bi-chat-square-text-fill"></i></div>
+                <span class="logo-text">SMS Expert</span>
+            </a>
+            <nav class="nav-links">
+                <a href="performance-report.html" class="nav-link"><i class="bi bi-graph-up-arrow"></i> Performance</a>
+                <a href="benchmark-report.html" class="nav-link"><i class="bi bi-bar-chart-line"></i> Benchmark</a>
+                <a href="#platforms" class="nav-link highlight"><i class="bi bi-grid-3x3-gap"></i> View Guides</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Complete Documentation</span>
+        </div>
+        <h1>SMS Expert User Guide</h1>
+        <p>Everything you need to know about sending SMS, managing campaigns, and administering your SMS Expert platform.</p>
+        <div class="hero-buttons">
+            <a href="#platforms" class="btn-hero primary">
+                <i class="bi bi-book"></i> Get Started
+            </a>
+            <a href="performance-report.html" class="btn-hero secondary">
+                <i class="bi bi-graph-up-arrow"></i> View Performance Report
+            </a>
+            <a href="benchmark-report.html" class="btn-hero secondary">
+                <i class="bi bi-bar-chart-line"></i> Benchmark Report
+            </a>
+        </div>
+    </section>
+
+    <!-- Platforms -->
+    <section class="platforms" id="platforms">
+        <div class="section-label">
+            <span>Select Platform</span>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Dashboard -->
+            <div class="platform-card dashboard">
+                <div class="card-icon">
+                    <i class="bi bi-speedometer2"></i>
+                </div>
+                <div class="card-url">
+                    <i class="bi bi-link-45deg"></i>
+                    dashboard.devsmsexpert.com
+                </div>
+                <h3>Customer Dashboard</h3>
+                <p>The main customer interface for sending SMS, managing keywords, tracking deliveries, and handling your wallet.</p>
+                <ul class="feature-list">
+                    <li><i class="bi bi-check-circle-fill"></i> Send SMS Messages</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Keyword Management</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Contact Groups</li>
+                    <li><i class="bi bi-check-circle-fill"></i> SMS History & Tracking</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Wallet & Invoices</li>
+                </ul>
+                <a href="userguide-dashboard.html" class="card-btn">
+                    View Dashboard Guide <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Campaign -->
+            <div class="platform-card campaign">
+                <div class="card-icon">
+                    <i class="bi bi-megaphone"></i>
+                </div>
+                <div class="card-url">
+                    <i class="bi bi-link-45deg"></i>
+                    campaign.devsmsexpert.com
+                </div>
+                <h3>Campaign Manager</h3>
+                <p>Create and manage bulk SMS campaigns with powerful file upload features and real-time tracking.</p>
+                <ul class="feature-list">
+                    <li><i class="bi bi-check-circle-fill"></i> Quick Campaigns</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Bulk File Upload</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Campaign Tracking</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Pause/Resume Control</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Download Reports</li>
+                </ul>
+                <a href="userguide-campaign.html" class="card-btn">
+                    View Campaign Guide <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Admin -->
+            <div class="platform-card admin">
+                <div class="card-icon">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <div class="card-url">
+                    <i class="bi bi-link-45deg"></i>
+                    admin.devsmsexpert.com
+                </div>
+                <h3>Admin Panel</h3>
+                <p>System administration for managing customers, virtual numbers, reports, and platform configuration.</p>
+                <ul class="feature-list">
+                    <li><i class="bi bi-check-circle-fill"></i> Customer Management</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Virtual Numbers</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Reports & Analytics</li>
+                    <li><i class="bi bi-check-circle-fill"></i> System Settings</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Admin Users & Roles</li>
+                </ul>
+                <a href="userguide-admin.html" class="card-btn">
+                    View Admin Guide <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Migration -->
+            <div class="platform-card migration">
+                <div class="card-icon">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <div class="card-url">
+                    <i class="bi bi-link-45deg"></i>
+                    admin.devsmsexpert.com/migration
+                </div>
+                <h3>Migration Tool</h3>
+                <p>Migrate customers from old API to new API endpoint. Same request format, only URL changes.</p>
+                <ul class="feature-list">
+                    <li><i class="bi bi-check-circle-fill"></i> Customer Selection</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Migration Table</li>
+                    <li><i class="bi bi-check-circle-fill"></i> API URL Update</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Status Tracking</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Migration History</li>
+                </ul>
+                <a href="userguide-migration.html" class="card-btn">
+                    View Migration Guide <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Report Section -->
+    <!-- <section class="performance-section">
+        <div class="performance-card">
+            <div class="performance-content">
+                <div class="performance-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="performance-info">
+                    <h3>Performance Report</h3>
+                    <p>View detailed load testing results comparing Old Server vs New Server performance across all platforms.</p>
+                    <div class="performance-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">26x</span>
+                            <span class="stat-label">Faster</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">35K</span>
+                            <span class="stat-label">Max SMS</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">100%</span>
+                            <span class="stat-label">Success Rate</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="performance-report.html" class="btn-performance">
+                    View Full Report <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 SMS Expert. All rights reserved. | <a href="performance-report.html">Performance Report | <a href="benchmark-report.html">Benchmark Report</a></p>
+    </footer>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

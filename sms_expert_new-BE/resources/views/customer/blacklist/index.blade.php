@@ -1,0 +1,671 @@
+@extends('layouts.app')
+@section('title')
+    {{ __('Blacklist') }}
+@endsection
+@push('style')
+    <style>
+        .back-btn {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .modern-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .modern-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ea6118, #ff8a50);
+        }
+
+        .modern-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #ea6118 0%, #293b50 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0.5rem 0 0 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .icon-wrapper i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #293b50;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #ea6118, #ff8a50);
+            border-radius: 2px;
+        }
+
+        .breadcrumb-modern {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .breadcrumb-modern .breadcrumb {
+            margin: 0;
+            background: none;
+        }
+
+        .breadcrumb-modern .breadcrumb-item {
+            color: #6c757d;
+        }
+
+        .breadcrumb-modern .breadcrumb-item.active {
+            color: #ea6118;
+            font-weight: 600;
+        }
+
+        /* .back-btn {
+                        background: rgba(255, 255, 255, 0.2);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        color: white;
+                        border-radius: 10px;
+                        padding: 0.5rem 1rem;
+                        font-size: 0.9rem;
+                        transition: all 0.3s ease;
+                    }
+
+                    .back-btn:hover {
+                        background: rgba(255, 255, 255, 0.3);
+                        color: white;
+                        transform: translateX(-3px);
+                    } */
+
+        .alert-modern {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-success.alert-modern {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .alert-danger.alert-modern {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border-left: 4px solid #ea6118;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ea6118;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .modern-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .modern-table table {
+            margin: 0;
+        }
+
+        .modern-table thead th {
+            background: linear-gradient(135deg, #293b50 0%, #1f2c3d 100%);
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .modern-table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        .modern-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+        }
+
+        .download-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid #ea6118;
+        }
+
+        .download-title {
+            color: #293b50;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #ea6118, #ff8a50);
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(234, 97, 24, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(234, 97, 24, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .main-content {
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* DataTable Customization */
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.5rem;
+        }
+
+        .dataTables_wrapper .dataTables_length select:focus,
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #ea6118;
+            box-shadow: 0 0 0 0.2rem rgba(234, 97, 24, 0.15);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border: none;
+            border-radius: 8px;
+            margin: 0 2px;
+            padding: 0.5rem 1rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: linear-gradient(135deg, #ea6118, #ff8a50) !important;
+            color: white !important;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.5rem;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .modern-card {
+                border-radius: 15px;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark theme support */
+        [data-bs-theme="dark"] .modern-card {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+        }
+
+        [data-bs-theme="dark"] .section-title {
+            color: #e2e8f0;
+        }
+
+        [data-bs-theme="dark"] .modern-table {
+            background: #2d3748;
+        }
+
+        [data-bs-theme="dark"] .modern-table tbody td {
+            border-bottom-color: #4a5568;
+            color: #e2e8f0;
+        }
+
+        [data-bs-theme="dark"] .stat-card,
+        [data-bs-theme="dark"] .download-section {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: #e2e8f0;
+        }
+
+        /* Breadcrumb Container Styling */
+        .breadcrumb-container {
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb-title {
+            color: #293b50;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-primary {
+            color: #ea6118;
+            font-size: 1.2rem;
+        }
+
+        .breadcrumb {
+            margin: 0;
+            background: transparent;
+            padding: 0;
+        }
+
+        .breadcrumb-item {
+            color: #6c757d;
+        }
+
+        .breadcrumb-item a {
+            color: #ea6118;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: #6c757d;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #64748b, #475569);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+            color: white;
+        }
+    </style>
+@endpush
+
+@section('content')
+    <!-- Breadcrumb Container -->
+    <div class="breadcrumb-container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <div class="breadcrumb-title pe-3">
+                <i class="material-icons-outlined icon-primary">block</i>
+                Blacklist Management
+            </div>&nbsp;
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {{-- <li class="breadcrumb-item">
+                        <i class="material-icons-outlined">home</i>
+                    </li> --}}
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active">Blacklist</li>
+                </ol>
+            </nav>
+        </div>
+        <button id="backButton" class="btn btn-outline-secondary back-btn">
+            <i class="material-icons-outlined me-1">arrow_back</i> Back
+        </button>
+    </div>
+
+    <!-- Flash Messages -->
+    @if (session('success'))
+        <div id="flash-message" class="alert alert-success alert-modern">
+            <i class="material-icons-outlined me-2" style="vertical-align: middle;">check_circle</i>
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div id="flash-error-message" class="alert alert-danger alert-modern">
+            <i class="material-icons-outlined me-2" style="vertical-align: middle;">error</i>
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ count($userData) }}</div>
+            <div class="stat-label">Total Blacklisted Numbers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ count($userData->where('date_blocked', '>=', now()->subDays(30))) }}</div>
+            <div class="stat-label">Added This Month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ count($userData->where('date_blocked', '>=', now()->subDays(7))) }}</div>
+            <div class="stat-label">Added This Week</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="modern-card">
+                <div class="card-body p-4">
+                    <h5 class="section-title">
+                        <i class="material-icons-outlined me-2" style="font-size: 1.2rem; vertical-align: middle;">list</i>
+                        Blacklisted Numbers
+                    </h5>
+
+                    <div class="modern-table">
+                        <table id="blacklist_all_view" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>
+                                        <i class="material-icons-outlined me-2" style="font-size: 1rem;">phone</i>
+                                        Phone Number
+                                    </th>
+                                    <th>
+                                        <i class="material-icons-outlined me-2" style="font-size: 1rem;">schedule</i>
+                                        Blocked Date
+                                    </th>
+                                    <th>
+                                        <i class="material-icons-outlined me-2" style="font-size: 1rem;">info</i>
+                                        Status
+                                    </th>
+                                    <th>
+                                        <i class="material-icons-outlined me-2" style="font-size: 1rem;">flash_on</i>
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($userData as $record)
+                                    <tr class="text-center">
+                                        <td>
+                                            <strong>{{ $record->msisdn ?? 'N/A' }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">
+                                                {{ $record->date_blocked ? \Carbon\Carbon::parse($record->date_blocked)->format('d M Y, H:i') : 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge">
+                                                {{-- <i class="material-icons-outlined me-1" style="font-size: 0.8rem;">block</i> --}}
+                                                Blocked
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{-- <form action="{{ route('blacklist.destroy', $record->id) }}" method="POST"
+                                                onsubmit="return confirm('Are you sure you want to delete this record?');"> --}}
+                                            <form action="{{ route('blacklist.destroy', $record->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 50rem;">
+                                                     Unblock
+                                                </button>
+                                            </form>
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                                {{-- <tr class="text-center">
+                                        <td>
+                                            <strong>{{ $record->msisdn ?? 'N/A' }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">
+                                                {{ $record->date_blocked ? $record->date_blocked->format('d M Y, H:i') : 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge">
+                                                <i class="material-icons-outlined me-1" style="font-size: 0.8rem;">block</i>
+                                                Active
+                                            </span>
+                                        </td>
+                                    </tr> --}}
+                                {{-- @endforeach --}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Download Section -->
+                    <div class="download-section">
+                        <div class="download-title">
+                            <i class="material-icons-outlined me-2" style="color: #ea6118;">backup</i>
+                            Backup & Maintenance
+                        </div>
+                        <p class="text-muted mb-3">Download a complete backup of all blacklisted numbers for your records.
+                        </p>
+                        <a href="{{ route('blacklist.download') }}" class="btn-download">
+                            <i class="material-icons-outlined me-2" style="font-size: 1rem;">download</i>
+                            Download All Records
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('js')
+    <script src="{{ asset('assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script>
+        // $(document).ready(function() {
+        //     $('#blacklist_all_view').DataTable({
+        //         responsive: true,
+        //         pageLength: 25,
+        //         order: [
+        //             [1, 'desc']
+        //         ], // Sort by date descending
+        //         language: {
+        //             search: "Search numbers:",
+        //             lengthMenu: "Show _MENU_ entries",
+        //             info: "Showing _START_ to _END_ of _TOTAL_ blacklisted numbers",
+        //             paginate: {
+        //                 first: "First",
+        //                 last: "Last",
+        //                 next: "Next",
+        //                 previous: "Previous"
+        //             }
+        //         },
+        //         columnDefs: [{
+        //                 targets: [0], // Phone number column
+        //                 className: 'fw-bold'
+        //             },
+        //             {
+        //                 targets: [2], // Status column
+        //                 className: 'text-center'
+        //             }
+        //         ]
+        //     });
+        // });
+
+        // Flash message auto-hide with smooth transition
+        setTimeout(function() {
+            let flashMessage = document.getElementById('flash-message');
+            if (flashMessage) {
+                flashMessage.style.opacity = '0';
+                flashMessage.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => flashMessage.style.display = 'none', 500);
+            }
+        }, 3000);
+
+        setTimeout(function() {
+            let flashMessage = document.getElementById('flash-error-message');
+            if (flashMessage) {
+                flashMessage.style.opacity = '0';
+                flashMessage.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => flashMessage.style.display = 'none', 500);
+            }
+        }, 3000);
+
+        // Add smooth scrolling to table actions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading state to download button
+            const downloadBtn = document.querySelector('.btn-download');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    this.innerHTML =
+                        '<i class="material-icons-outlined me-2">hourglass_empty</i>Preparing Download...';
+                    setTimeout(() => {
+                        this.innerHTML =
+                            '<i class="material-icons-outlined me-2">download</i>Download All Records';
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+@endpush

@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Models\AdminNotification;
+use App\Jobs\SendNotificationJob;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+
+class ProcessScheduledNotificationsCommand extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'notifications:process-scheduled';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Process scheduled notifications that are due to be sent';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        $this->info('Checking for scheduled notifications...');
+
+        $notifications = AdminNotification::where('status', 'scheduled')
+            ->where('scheduled_at', '<=', now())
+            ->get();
+
+        if ($notifications->isEmpty()) {
+            $this->info('No scheduled notifications to process.');
+            return 0;
+        }
+
+        $this->info("Found {$notifications->count()} notification(s) to process.");
+
+        foreach ($notifications as $notification) {
+            try {
+                $notification->update(['status' => 'sending']);
+                SendNotificationJob::dispatch($notification->id);
+                $this->info("Dispatched notification: {$notification->id} - {$notification->title}");
+            } catch (\Exception $e) {
+                Log::error("Failed to dispatch notification {$notification->id}: " . $e->getMessage());
+                $this->error("Failed to dispatch notification: {$notification->id}");
+            }
+        }
+
+        $this->info('Scheduled notifications processed successfully!');
+        return 0;
+    }
+}

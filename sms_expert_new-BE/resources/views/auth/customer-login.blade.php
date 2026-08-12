@@ -1,0 +1,686 @@
+@extends('layouts.auth')
+@section('title', 'Dashboard Login')
+
+@push('style')
+    <style>
+        .back-btn {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+            background: linear-gradient(135deg, #293B50 0%, #1e2a3a 100%) !important;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Main container */
+        .auth-wrapper {
+            min-height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background pattern */
+        .auth-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            pointer-events: none;
+        }
+
+        /* Login card */
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 900px;
+            height: calc(100vh - 2rem);
+            max-height: 580px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Left side branding */
+        .auth-brand {
+            background: linear-gradient(135deg, #293B50 0%, #1e2a3a 100%);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-brand::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(234,97,24,0.1)" stroke-width="0.5"/><circle cx="75" cy="75" r="15" fill="none" stroke="rgba(234,97,24,0.1)" stroke-width="0.3"/><circle cx="50" cy="10" r="5" fill="rgba(234,97,24,0.1)"/><circle cx="10" cy="80" r="3" fill="rgba(234,97,24,0.1)"/></svg>') repeat;
+            animation: float 30s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-20px) rotate(360deg);
+            }
+        }
+
+        /* SMS Expert Logo Styling */
+        .brand-logo-container {
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-logo-text {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-logo-text .sms-text {
+            color: #ea6118;
+            /* Orange color for SMS */
+        }
+
+        .brand-logo-text .expert-text {
+            color: white;
+            /* White color for Expert */
+        }
+
+        .brand-underline {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #ea6118, #ff8a50);
+            border-radius: 2px;
+            margin: 0 auto 1rem;
+        }
+
+        .brand-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.4;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #ea6118, #ff8a50);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-icon i {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .feature-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: white;
+            opacity: 0.9;
+        }
+
+        /* Right side form */
+        .auth-form {
+            background: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #293B50;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-subtitle {
+            color: #6c757d;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #293B50;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef !important;
+            border-radius: 12px !important;
+            padding: 0.8rem 1rem !important;
+            font-size: 0.95rem !important;
+            transition: all 0.3s ease !important;
+            background: #f8f9fa !important;
+            color: #293B50 !important;
+            height: auto !important;
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd !important;
+        }
+
+        .form-control:focus {
+            border-color: #ea6118 !important;
+            box-shadow: 0 0 0 0.25rem rgba(234, 97, 24, 0.15) !important;
+            transform: translateY(-2px) !important;
+            background: white !important;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            cursor: pointer;
+            z-index: 10;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #ea6118;
+            background: rgba(234, 97, 24, 0.1);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #ea6118, #ff8a50) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 0.8rem 1.5rem !important;
+            font-weight: 600 !important;
+            color: white !important;
+            font-size: 1rem !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 6px 20px rgba(234, 97, 24, 0.3) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.5rem !important;
+            height: 48px !important;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 35px rgba(234, 97, 24, 0.4) !important;
+            color: white !important;
+        }
+
+        .btn-login:active {
+            transform: translateY(-1px) !important;
+        }
+
+        .form-extras {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6c757d;
+        }
+
+        .forgot-link {
+            color: #ea6118;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-link:hover {
+            color: #d1520e;
+            text-decoration: underline;
+        }
+
+        /* Alerts */
+        .alert-modern {
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 0.8rem 1rem !important;
+            margin-bottom: 1rem !important;
+            font-size: 0.9rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+
+        .alert-success.alert-modern {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+            color: #155724 !important;
+            border-left: 4px solid #28a745 !important;
+        }
+
+        .alert-danger.alert-modern {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb) !important;
+            color: #721c24 !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+        .error-text {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .auth-card {
+                max-width: 800px;
+            }
+
+            .brand-logo-text {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                grid-template-columns: 1fr;
+                max-width: 450px;
+            }
+
+            .auth-brand {
+                order: 1;
+                padding: 3rem 2rem;
+                min-height: 400px;
+            }
+
+            .auth-form {
+                order: 2;
+                padding: 3rem 2rem;
+            }
+
+            .brand-logo-text {
+                font-size: 3rem;
+            }
+
+            .form-title {
+                font-size: 2rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-wrapper {
+                padding: 1rem;
+            }
+
+            .auth-form {
+                padding: 2rem 1.5rem;
+            }
+
+            .auth-brand {
+                padding: 2rem 1.5rem;
+            }
+
+            .auth-card {
+                border-radius: 16px;
+            }
+
+            .brand-logo-text {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+@endpush
+
+@section('content')
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <!-- Left Side - Branding -->
+            <div class="auth-brand">
+                <div class="brand-logo-container">
+                    <div class="brand-logo-text">
+                        <span class="sms-text">SMS</span><span class="expert-text">Expert</span>
+                    </div>
+                    <div class="brand-underline"></div>
+                </div>
+
+                <p class="brand-subtitle">Professional SMS Marketing Platform for Modern Businesses</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="material-icons-outlined">send</i>
+                        </div>
+                        <div class="feature-text">Reliable Delivery</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="material-icons-outlined">analytics</i>
+                        </div>
+                        <div class="feature-text">Smart Analytics</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="material-icons-outlined">security</i>
+                        </div>
+                        <div class="feature-text">Enterprise Security</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="material-icons-outlined">support_agent</i>
+                        </div>
+                        <div class="feature-text">Expert Support</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Login Form -->
+            <div class="auth-form">
+                <div class="form-header">
+                    <h2 class="form-title">Welcome Back</h2>
+                    <p class="form-subtitle">Sign in to access your SMS Expert dashboard</p>
+                </div>
+
+                <!-- Flash Messages -->
+                @if (session('success'))
+                    <div id="flash-message" class="alert alert-success alert-modern">
+                        {{-- <i class="material-icons-outlined" style="font-size: 1.1rem;">check_circle</i> --}}
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if (session('error'))
+                    <div id="flash-error-message" class="alert alert-danger alert-modern">
+                        {{-- <i class="material-icons-outlined" style="font-size: 1.1rem;">error</i> --}}
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        <label for="userName" class="form-label">
+                            <i class="material-icons-outlined" style="font-size: 1.1rem; color: #ea6118;">person</i>
+                            Username
+                        </label>
+                        <input type="text" class="form-control" id="userName" name="userName"
+                            placeholder="Enter your username" required autocomplete="username">
+                        @error('userName')
+                            <div class="error-text">
+                                <i class="material-icons-outlined" style="font-size: 0.9rem;">error</i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="material-icons-outlined" style="font-size: 1.1rem; color: #ea6118;">lock</i>
+                            Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Enter your password" required autocomplete="current-password">
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="material-icons-outlined" id="password-icon">visibility_off</i>
+                            </button>
+                        </div>
+                        @error('password')
+                            <div class="error-text">
+                                <i class="material-icons-outlined" style="font-size: 0.9rem;">error</i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+
+                    <!-- Form Extras -->
+                    <div class="form-extras">
+                        <div class="remember-me">
+                            <!-- Remember me could go here if needed -->
+                        </div>
+                        <a href="{{ route('forgot_password') }}" class="forgot-link">
+                            Forgot Password?
+                        </a>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="btn btn-primary btn-login" id="loginBtn">
+                        <i class="material-icons-outlined" style="font-size: 1.1rem;">login</i>
+                        Sign In to Dashboard
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal MUST be here (outside container, near body end) -->
+    <div class="modal fade" id="migrationModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Redirect Notice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                </div>
+
+                <div class="modal-body">
+                    Your account is available in the old SMS Expert System.
+                    Click OK to continue.
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="confirmMigration" class="btn btn-primary">
+                        OK
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+
+            @if (session('migration_redirect'))
+
+                var migrationUrl = "{{ session('migration_url') }}";
+
+                var modalElement = document.getElementById('migrationModal');
+                var modal = new bootstrap.Modal(modalElement);
+                modal.show();
+
+                document.getElementById('confirmMigration').addEventListener('click', function() {
+                    window.location.href = migrationUrl;
+                });
+            @endif
+
+            // Auto-hide flash messages
+            setTimeout(function() {
+                const flashMessages = document.querySelectorAll('#flash-message, #flash-error-message');
+                flashMessages.forEach(msg => {
+                    if (msg) {
+                        msg.style.opacity = '0';
+                        msg.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => msg.style.display = 'none', 500);
+                    }
+                });
+            }, 5000);
+
+            // Add loading state to login button
+            const loginForm = document.querySelector('form');
+            const loginButton = document.getElementById('loginBtn');
+
+            if (loginForm && loginButton) {
+                loginForm.addEventListener('submit', function() {
+                    loginButton.innerHTML = '<div class="loading-spinner"></div>Signing In...';
+                    loginButton.disabled = true;
+                });
+            }
+
+            // Add subtle animations on load
+            const card = document.querySelector('.auth-card');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        });
+
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const passwordIcon = document.getElementById('password-icon');
+
+            if (passwordField && passwordIcon) {
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    passwordIcon.textContent = 'visibility';
+                } else {
+                    passwordField.type = 'password';
+                    passwordIcon.textContent = 'visibility_off';
+                }
+            }
+        }
+
+        // Clear navigation storage
+        sessionStorage.removeItem("navStack");
+        sessionStorage.removeItem("navStackIndex");
+
+        console.log('SMS Expert branded login page loaded successfully!');
+    </script>
+@endpush

@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel Guide - SMS Expert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #ffffff;
+            --bg-sidebar: #f8f9fa;
+            --bg-card: rgba(0, 0, 0, 0.02);
+            --bg-card-hover: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --accent-cyan: #06b6d4;
+            --accent-sky: #22d3ee;
+            --accent-green: #10b981;
+            --gradient-primary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-logo span {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(0, 242, 254, 0.15));
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--accent-sky);
+            width: 100%;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            padding: 12px 25px 6px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--bg-card);
+            color: var(--accent-sky);
+            border-left-color: var(--accent-cyan);
+        }
+
+        .nav-link i {
+            font-size: 1rem;
+            width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-footer a:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-header h1 i {
+            width: 55px;
+            height: 55px;
+            background: var(--gradient-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-area {
+            padding: 40px 50px;
+        }
+
+        .guide-section {
+            margin-bottom: 50px;
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .section-card h2 i {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2));
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--accent-sky);
+        }
+
+        .section-card>p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .section-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 25px 0 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-card h3:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 20px;
+        }
+
+        .screenshot {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .screenshot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .screenshot p {
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin: 10px 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .screenshot small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .screenshot img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .steps {
+            list-style: none;
+            padding: 0;
+            counter-reset: step;
+        }
+
+        .steps li {
+            position: relative;
+            padding: 15px 18px 15px 60px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .steps li:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .steps li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: var(--gradient-primary);
+            color: #fff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .alert-box {
+            padding: 18px 22px;
+            border-radius: 10px;
+            margin: 18px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-box i {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-box.tip {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-box.tip i {
+            color: var(--accent-green);
+        }
+
+        .alert-box.warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .alert-box.warning i {
+            color: #fbbf24;
+        }
+
+        .alert-box.info {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .alert-box.info i {
+            color: var(--accent-cyan);
+        }
+
+        .alert-box.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-box.danger i {
+            color: #ef4444;
+        }
+
+        .alert-box-content strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .alert-box-content p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .guide-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+        }
+
+        .guide-table th {
+            background: rgba(0, 0, 0, 0.04);
+            padding: 12px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .guide-table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .guide-table tr:hover td {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .creds-card {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+
+        .creds-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-sky);
+            margin-bottom: 12px;
+        }
+
+        .creds-card .cred-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .creds-card .cred-row:last-child {
+            border-bottom: none;
+        }
+
+        .creds-card .cred-label {
+            width: 90px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .creds-card .cred-value {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .feature-item {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .feature-item h5 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .feature-item h5 i {
+            color: var(--accent-sky);
+        }
+
+        .feature-item p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        .tab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .tab-item {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-item h6 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-sky);
+            margin-bottom: 5px;
+        }
+
+        .tab-item p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .badge-warning {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .badge-primary {
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4;
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-header,
+            .content-area {
+                padding: 25px;
+            }
+
+            .page-header h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="userguide.html" class="sidebar-logo">
+                <div class="sidebar-logo-icon"><i class="bi bi-chat-square-text-fill"></i></div>
+                <span>SMS Expert</span>
+            </a>
+            <div class="sidebar-badge"><i class="bi bi-shield-lock"></i> Admin Panel</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">Getting Started</div>
+            <a href="#dashboard" class="nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+
+            <div class="nav-section">Customer Management</div>
+            <a href="#customers" class="nav-link"><i class="bi bi-people"></i> Customer List</a>
+            <a href="#customer-detail" class="nav-link"><i class="bi bi-person-lines-fill"></i> Customer Details</a>
+            <a href="#add-customer" class="nav-link"><i class="bi bi-person-plus"></i> Add Customer</a>
+            <a href="#customer-rates" class="nav-link"><i class="bi bi-currency-pound"></i> SMS Rates</a>
+            <a href="#customer-wallet" class="nav-link"><i class="bi bi-wallet2"></i> Wallet Management</a>
+            <a href="#customer-migration" class="nav-link"><i class="bi bi-arrow-left-right"></i> Migration Flag</a>
+
+            <div class="nav-section">Virtual Numbers</div>
+            <a href="#virtual-numbers" class="nav-link"><i class="bi bi-phone"></i> Virtual Numbers</a>
+            <a href="#shortcodes" class="nav-link"><i class="bi bi-hash"></i> Shortcodes</a>
+
+            <div class="nav-section">Reports</div>
+            <a href="#reports" class="nav-link"><i class="bi bi-bar-chart"></i> Reports</a>
+
+            <div class="nav-section">Cost Management</div>
+            <a href="#vonage-cost" class="nav-link"><i class="bi bi-broadcast"></i> Vonage Cost</a>
+            <a href="#sinch-cost" class="nav-link"><i class="bi bi-send"></i> Sinch Cost</a>
+            <a href="#global-pricing" class="nav-link"><i class="bi bi-tag"></i> Global Pricing</a>
+
+            <div class="nav-section">System</div>
+            <a href="#settings" class="nav-link"><i class="bi bi-gear"></i> Settings</a>
+            <a href="#admin-users" class="nav-link"><i class="bi bi-person-badge"></i> Admin Users</a>
+            <a href="#activity-logs" class="nav-link"><i class="bi bi-journal-text"></i> Activity Logs</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="userguide.html"><i class="bi bi-arrow-left"></i> Back to Guide Home</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="bi bi-shield-lock"></i> Admin Panel Guide</h1>
+            <p>System administration for managing customers, virtual numbers, reports, and configuration.</p>
+        </div>
+
+        <div class="content-area">
+            <!-- Dashboard -->
+            <section id="dashboard" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+                    <p>Overview of platform activity, revenue, and system health.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-dashboard.png" alt="Admin Dashboard">
+                        <p>Admin Dashboard</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-chat-square-text"></i> Total SMS</h5>
+                            <p>Daily/Monthly volume</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-currency-pound"></i> Revenue</h5>
+                            <p>Profit tracking</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-people"></i> Customers</h5>
+                            <p>Active accounts</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-check-circle"></i> Delivery Rate</h5>
+                            <p>Success percentage</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customer List -->
+            <section id="customers" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-people"></i> Customer List</h2>
+                    <p>View and manage all customer accounts.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-customers.png" alt="Customer List">
+                        <p>Customer List</p>
+                    </div>
+
+                    <h3>Customer Table</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Column</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Username</td>
+                                <td>Customer's login username</td>
+                            </tr>
+                            <tr>
+                                <td>Business Name</td>
+                                <td>Company name</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>Contact email</td>
+                            </tr>
+                            <tr>
+                                <td>Balance</td>
+                                <td>Current wallet balance</td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>Active/Inactive</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Customer Detail -->
+            <section id="customer-detail" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-person-lines-fill"></i> Customer Details</h2>
+                    <p>Manage all aspects of a customer account.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-customer-detail.png" alt="Customer Detail Page">
+                        <p>Customer Detail Page</p>
+                    </div>
+
+                    <h3>Customer Tabs</h3>
+                    <div class="tab-grid">
+                        <div class="tab-item">
+                            <h6><i class="bi bi-person"></i> Profile</h6>
+                            <p>Contact information</p>
+                        </div>
+                        <div class="tab-item">
+                            <h6><i class="bi bi-currency-pound"></i> SMS Rates</h6>
+                            <p>Custom pricing</p>
+                        </div>
+                        <div class="tab-item">
+                            <h6><i class="bi bi-tag"></i> Keywords</h6>
+                            <p>Assigned keywords</p>
+                        </div>
+                        <div class="tab-item">
+                            <h6><i class="bi bi-phone"></i> Virtual Numbers</h6>
+                            <p>Dedicated numbers</p>
+                        </div>
+                        <div class="tab-item">
+                            <h6><i class="bi bi-wallet2"></i> Wallet</h6>
+                            <p>Balance management</p>
+                        </div>
+                        <div class="tab-item">
+                            <h6><i class="bi bi-percent"></i> Margin</h6>
+                            <p>Profit margin</p>
+                        </div>
+                        <div class="tab-item">
+                            <h6><i class="bi bi-journal-text"></i> SMS Logs</h6>
+                            <p>Activity history</p>
+                        </div>
+                        <div class="tab-item">
+                            <h6><i class="bi bi-sticky"></i> Notes</h6>
+                            <p>Internal notes</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Customer -->
+            <section id="add-customer" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-person-plus"></i> Add New Customer</h2>
+                    <p>Create a new customer account.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-add-customer.png" alt="Add Customer Form">
+                        <p>Add Customer Form</p>
+                    </div>
+
+                    <h3>Creating a Customer</h3>
+                    <ul class="steps">
+                        <li>Click <strong>Add Customer</strong> button</li>
+                        <li>Fill in <strong>Company Information</strong> (Business Name, Contact Person)</li>
+                        <li>Fill in <strong>Contact Details</strong> (Email, Phone)</li>
+                        <li>Set <strong>Account Credentials</strong> (Username, Password)</li>
+                        <li>Configure <strong>Initial Settings</strong></li>
+                        <li>Click <strong>Save Customer</strong></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Customer Rates -->
+            <section id="customer-rates" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-currency-pound"></i> SMS Rates</h2>
+                    <p>Configure country-specific SMS pricing.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-customer-rates.png" alt="SMS Rates Tab">
+                        <p>SMS Rates Tab</p>
+                    </div>
+
+                    <h3>Managing Rates</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Add Rate</td>
+                                <td>Add country-specific pricing</td>
+                            </tr>
+                            <tr>
+                                <td>Edit Rate</td>
+                                <td>Modify rate amount</td>
+                            </tr>
+                            <tr>
+                                <td>Toggle</td>
+                                <td>Enable/disable rate</td>
+                            </tr>
+                            <tr>
+                                <td>Delete</td>
+                                <td>Remove custom rate</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Wallet Management -->
+            <section id="customer-wallet" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-wallet2"></i> Wallet Management</h2>
+                    <p>Manage customer wallet balances.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-wallet.png" alt="Wallet Management">
+                        <p>Wallet Management</p>
+                    </div>
+
+                    <h3>Wallet Actions</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Add Balance</td>
+                                <td>Add credits to wallet</td>
+                            </tr>
+                            <tr>
+                                <td>Add Loan</td>
+                                <td>Apply credit loan</td>
+                            </tr>
+                            <tr>
+                                <td>Platform Fees</td>
+                                <td>Add service fees</td>
+                            </tr>
+                            <tr>
+                                <td>View History</td>
+                                <td>Transaction history</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Note</strong>
+                            <p>All wallet adjustments are logged for audit purposes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Migration Flag -->
+            <section id="customer-migration" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-arrow-left-right"></i> Migration Flag</h2>
+                    <p>Manage system access based on migration flag settings.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/customer-migration.png" alt="Migration Flag">
+                        <p>Migration Flag Settings</p>
+                    </div>
+
+                    <h3>Migration Flag Actions</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>New System</td>
+                                <td>User can access only the New System</td>
+                            </tr>
+                            <tr>
+                                <td>Old System</td>
+                                <td>User can access only the Old System</td>
+                            </tr>
+                            <tr>
+                                <td>Update</td>
+                                <td>Update the selected migration flag</td>
+                            </tr>
+                            <tr>
+                                <td>History</td>
+                                <td>View current status and previous migration changes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Note</strong>
+                            <p>
+                                Access is strictly controlled based on the selected migration flag.
+                                If "New System" is selected, only the new system will be accessible.
+                                If "Old System" is selected, only the old system will be accessible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Virtual Numbers -->
+            <section id="virtual-numbers" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-phone"></i> Virtual Numbers</h2>
+                    <p>Manage virtual phone numbers for customers.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-virtual-numbers.png" alt="Virtual Numbers List">
+                        <p>Virtual Numbers List</p>
+                    </div>
+
+                    <h3>Number Actions</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Assign</td>
+                                <td>Link number to customer</td>
+                            </tr>
+                            <tr>
+                                <td>Reassign</td>
+                                <td>Move to different customer</td>
+                            </tr>
+                            <tr>
+                                <td>Extend Expiry</td>
+                                <td>Add 12 months</td>
+                            </tr>
+                            <tr>
+                                <td>Suspend</td>
+                                <td>Temporarily disable</td>
+                            </tr>
+                            <tr>
+                                <td>Sync</td>
+                                <td>Sync with Nexmo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Shortcodes -->
+            <section id="shortcodes" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-hash"></i> Shortcodes</h2>
+                    <p>Manage SMS shortcodes and routing settings.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-shortcodes.png" alt="Shortcodes Management">
+                        <p>Shortcodes Management</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports -->
+            <section id="reports" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-bar-chart"></i> Reports</h2>
+                    <p>Generate comprehensive reports on SMS activity and revenue.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-reports.png" alt="Reports Dashboard">
+                        <p>Reports Dashboard</p>
+                    </div>
+
+                    <h3>Available Reports</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-credit-card"></i> PostPay Report</h5>
+                            <p>Postpaid usage</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-calendar-day"></i> Daily Report</h5>
+                            <p>Daily SMS breakdown</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-cash-stack"></i> Money Transfer</h5>
+                            <p>Fund transfers</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-receipt"></i> Sales Report</h5>
+                            <p>Monthly invoices &amp; revenue</p>
+                        </div>
+                    </div>
+
+                    <h3>Sales Report Tab</h3>
+                    <p>The <strong>Sales Report</strong> is the last tab on the Reports page. It lists every
+                       invoice for the chosen period, grouped by month, with revenue totals split by payment
+                       method. Use it to review monthly sales, outstanding (unpaid) invoices, and per-customer
+                       billing.</p>
+
+                    <h4>Running a Sales Report</h4>
+                    <ul class="steps">
+                        <li>Open <strong>Reports</strong> and click the <strong>Sales Report</strong> tab.</li>
+                        <li>Pick a <strong>From (Month &amp; Year)</strong> and <strong>To (Month &amp; Year)</strong> using the month pickers.</li>
+                        <li>Optionally tick <strong>Status</strong> filters &mdash; <strong>Paid</strong>, <strong>Not yet paid</strong>, <strong>Deleted</strong> (all are included if none are ticked).</li>
+                        <li>Optionally tick <strong>Payment Method</strong> &mdash; <strong>PayPal / Card</strong> or <strong>BACS</strong> (all if none ticked).</li>
+                        <li>Optionally choose one or more <strong>Customers</strong> (leave blank for all customers).</li>
+                        <li>Click <strong>Show Report</strong> to preview on screen, or <strong>Generate Report</strong> to build an Excel file in the background.</li>
+                    </ul>
+
+                    <h4>Reading the Results</h4>
+                    <p>Each month appears as a collapsible card showing the invoice count and totals:
+                       <strong>Total</strong>, <strong>PayPal/Card</strong>, <strong>BACS</strong>, and
+                       <strong>Not yet paid</strong>. Expand a card to see every invoice with its
+                       <strong>Invoice #</strong>, date, customer, payment method, status badge, and amount (ex-VAT).</p>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Open a customer straight from the invoice</strong>
+                            <p>In the preview, each <strong>Invoice #</strong> is a clickable link (shown in
+                               purple). Click it to open that customer's admin page in a <strong>new browser
+                               tab</strong> &mdash; handy for checking the account without losing your report.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Show Report vs Generate Report</strong>
+                            <p><strong>Show Report</strong> previews the data instantly on screen.
+                               <strong>Generate Report</strong> builds a full Excel export in the background and
+                               emails you a download link when it is ready; the file also appears under
+                               <strong>Report History</strong> lower down the page. Use Generate for large date
+                               ranges so the page never times out.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vonage Cost Management -->
+            <section id="vonage-cost" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-broadcast"></i> Vonage Cost Management</h2>
+                    <p>Manage Vonage (Nexmo) SMS cost prices for all countries with automatic API pricing and currency conversion.</p>
+
+                    <div class="screenshot">
+                        <img src="../userguide-screenshots/admin-vonage-cost.png" alt="Vonage Cost Management">
+                        <p>Vonage Cost Management</p>
+                    </div>
+
+                    <h3>Key Features</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-currency-exchange"></i> EUR to GBP</h5>
+                            <p>Auto currency conversion</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-cloud-download"></i> Nexmo API</h5>
+                            <p>Fetch prices from API</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-file-earmark-excel"></i> Excel Import</h5>
+                            <p>Bulk price updates</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-shield-lock"></i> Manual Lock</h5>
+                            <p>Protect custom prices</p>
+                        </div>
+                    </div>
+
+                    <h3>Price Sources</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-info">API</span></td>
+                                <td>Fetched from Nexmo Pricing API. Updated daily at 00:30 via cron job.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge" style="background: rgba(111, 66, 193, 0.2); color: #6f42c1;">Manual</span></td>
+                                <td>Set by admin manually or via Excel upload. Protected from API overwrite.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Action Buttons</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Button</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="bi bi-pencil text-primary"></i> Edit</td>
+                                <td>Manually edit EUR price. Sets source to "Manual" (protected from API).</td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-cloud-download text-warning"></i> Fetch</td>
+                                <td>Fetch current price from Nexmo API for single country.</td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-unlock text-secondary"></i> Unlock</td>
+                                <td>Remove "Manual" protection to allow API updates.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Excel Operations</h3>
+                    <ul class="steps">
+                        <li><strong>Download Template</strong> - Get blank Excel with headers (ISO, Country, Dial Code, Cost EUR)</li>
+                        <li><strong>Export Data</strong> - Download current prices as Excel file for backup</li>
+                        <li><strong>Upload Prices</strong> - Import Excel to update prices (sets all as "Manual")</li>
+                    </ul>
+
+                    <h3>Automated Cron Jobs</h3>
+                    <div class="alert-box info">
+                        <i class="bi bi-clock"></i>
+                        <div class="alert-box-content">
+                            <strong>Daily Automation</strong>
+                            <p><strong>00:15</strong> - Exchange rate fetch (EUR to GBP)<br>
+                               <strong>00:30</strong> - Nexmo pricing fetch (skips "Manual" prices)</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Best Practice</strong>
+                            <p>Use "Manual" source for negotiated rates to prevent API overwrite. Export data before bulk changes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sinch Cost Management -->
+            <section id="sinch-cost" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-send"></i> Sinch Cost Management</h2>
+                    <p>Manage Sinch SMS cost prices for all countries. Prices are entered directly in GBP without currency conversion.</p>
+
+                    <div class="screenshot">
+                        <img src="../userguide-screenshots/admin-sinch-cost.png" alt="Sinch Cost Management">
+                        <p>Sinch Cost Management</p>
+                    </div>
+
+                    <h3>Key Differences from Vonage</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Vonage</th>
+                                <th>Sinch</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Currency</td>
+                                <td>EUR (converted to GBP)</td>
+                                <td>GBP only</td>
+                            </tr>
+                            <tr>
+                                <td>API Fetch</td>
+                                <td>Available (Nexmo API)</td>
+                                <td>Not available</td>
+                            </tr>
+                            <tr>
+                                <td>Auto Update</td>
+                                <td>Daily cron job</td>
+                                <td>Manual only</td>
+                            </tr>
+                            <tr>
+                                <td>Price Source</td>
+                                <td>Manual or API</td>
+                                <td>Manual only</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Managing Sinch Prices</h3>
+                    <ul class="steps">
+                        <li>Navigate to <strong>Cost > Sinch</strong> tab</li>
+                        <li>Use <strong>Search</strong> to find specific country</li>
+                        <li>Click <strong>Edit</strong> button to open price modal</li>
+                        <li>Enter <strong>GBP price</strong> (e.g., 0.016500)</li>
+                        <li>Click <strong>Save Changes</strong></li>
+                    </ul>
+
+                    <h3>Excel Operations</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-download"></i> Download Template</h5>
+                            <p>Blank Excel with country list</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-file-earmark-arrow-down"></i> Export Data</h5>
+                            <p>Current prices as Excel</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-upload"></i> Upload Prices</h5>
+                            <p>Bulk update from Excel</p>
+                        </div>
+                    </div>
+
+                    <h3>Excel Template Format</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>ISO Code</th>
+                                <th>Country Name</th>
+                                <th>Dial Code</th>
+                                <th>Sinch Cost (GBP)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>GB</td>
+                                <td>United Kingdom</td>
+                                <td>44</td>
+                                <td>0.016500</td>
+                            </tr>
+                            <tr>
+                                <td>US</td>
+                                <td>United States</td>
+                                <td>1</td>
+                                <td>0.006500</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>No Auto Updates</strong>
+                            <p>Sinch prices don't have automated API fetching. Update manually when you receive new rate cards from Sinch.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>When is Sinch Used?</strong>
+                            <p>SMS is routed through Sinch when the sender ID is configured with Sinch/mBlox operator in shortcodes settings.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Global Pricing -->
+            <section id="global-pricing" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-tag"></i> Global Pricing</h2>
+                    <p>Global Pricing is its own menu in the left sidebar (under Cost Management). It is the single place to control two things: the default SMS rate a brand-new customer is created with, and the customer-facing prices shown on the Contracts page. Values are saved once and used everywhere, so there are no hard-coded prices to hunt down in code.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-global-pricing.png" alt="Global Pricing">
+                        <p>Global Pricing (Admin &rarr; Global Pricing)</p>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-shield-lock"></i>
+                        <div class="alert-box-content">
+                            <strong>Who can see it?</strong>
+                            <p>The menu and page are gated by the <code>Global Pricing (Menu Access)</code> permission. It is granted to all admins automatically, and can be turned on/off per admin from <em>Admin Users &rarr; Edit &rarr; Menu Access Permissions</em>. If an admin does not have the permission, the menu is hidden for them and the page cannot be opened.</p>
+                        </div>
+                    </div>
+
+                    <h3><i class="bi bi-person-plus"></i> New Customer Onboarding Rate</h3>
+                    <p>The default UK SMS rate applied to a new customer's routes when their account is created (Add Customer). It is also shown as a note on the Add Customer form and reflected on the customer's SMS Rates tab. This value <strong>must be at or above cost price</strong> — it exists to stop new accounts being created below cost.</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Meaning</th>
+                                <th>Default</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Onboarding SMS rate (£ per SMS)</td>
+                                <td>UK rate a new customer's account starts on</td>
+                                <td>£0.0457 (4.57 pence)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3><i class="bi bi-receipt"></i> Contracts Pricing</h3>
+                    <p>These values are shown on the customer <strong>Contracts</strong> page for information only (customers cannot edit them). Editing here updates exactly what customers see on their contract.</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Meaning</th>
+                                <th>Default</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Effective from</td>
+                                <td>Date the contract pricing takes effect (shown on the Contracts page)</td>
+                                <td>01/09/2025</td>
+                            </tr>
+                            <tr>
+                                <td>Virtual UK number / keyword (£ per year)</td>
+                                <td>Annual price of a dedicated virtual number or keyword</td>
+                                <td>£250 / year</td>
+                            </tr>
+                            <tr>
+                                <td>Overseas SMS (pence per text)</td>
+                                <td>Rate for international (non-UK) SMS</td>
+                                <td>0.6 pence</td>
+                            </tr>
+                            <tr>
+                                <td>UK Tier 1 — up to / rate</td>
+                                <td>UK monthly volume up to this many texts uses this rate</td>
+                                <td>up to 20,000 &rarr; £0.0457</td>
+                            </tr>
+                            <tr>
+                                <td>UK Tier 2 — up to / rate</td>
+                                <td>UK monthly volume up to this many texts uses this rate</td>
+                                <td>up to 50,000 &rarr; £0.0390</td>
+                            </tr>
+                            <tr>
+                                <td>Over Tier 2 — rate</td>
+                                <td>UK rate once monthly volume passes the Tier 2 threshold</td>
+                                <td>£0.0356</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3><i class="bi bi-pencil-square"></i> How to Edit</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Step</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Open <strong>Global Pricing</strong> from the left sidebar (under Cost Management).</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Change any value in the <em>New Customer Onboarding Rate</em> or <em>Contracts Pricing</em> cards.</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Click <strong>Save Pricing</strong>. A green confirmation appears and the new values are live immediately.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Where these values appear</strong>
+                            <p>The onboarding rate is used on <em>Add Customer</em> (and shown on the customer's SMS Rates tab); the Contracts Pricing values are shown on each customer's <em>Contracts</em> page. Changing a value here updates all of those places at once.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings -->
+            <section id="settings" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-gear"></i> System Settings</h2>
+                    <p>Configure platform-wide settings.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-settings.png" alt="System Settings">
+                        <p>System Settings</p>
+                    </div>
+
+                    <h3>Settings Categories</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-sliders"></i> General</h5>
+                            <p>Platform configuration</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-shield-check"></i> Security</h5>
+                            <p>Authentication rules</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-person-check"></i> Customer</h5>
+                            <p>Default limits</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-code-square"></i> Environment</h5>
+                            <p>Env variables</p>
+                        </div>
+                    </div>
+
+                    <h3>Cache Management</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Clear All</td>
+                                <td>Clear all caches</td>
+                            </tr>
+                            <tr>
+                                <td>Clear Config</td>
+                                <td>Reload config files</td>
+                            </tr>
+                            <tr>
+                                <td>Clear Routes</td>
+                                <td>Refresh routing</td>
+                            </tr>
+                            <tr>
+                                <td>Optimize</td>
+                                <td>Rebuild cache</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Admin Users -->
+            <section id="admin-users" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-person-badge"></i> Admin Users</h2>
+                    <p>Manage administrator accounts and roles.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-users.png" alt="Admin Users List">
+                        <p>Admin Users List</p>
+                    </div>
+
+                    <h3>Available Roles</h3>
+                    <ul class="steps">
+                        <li><strong>Super Admin</strong> - Full access to all features</li>
+                        <li><strong>Customer Manager</strong> - Manage customers</li>
+                        <li><strong>Report Viewer</strong> - View reports only</li>
+                        <li><strong>Support</strong> - Limited access</li>
+                    </ul>
+
+                    <div class="alert-box danger">
+                        <i class="bi bi-exclamation-octagon"></i>
+                        <div class="alert-box-content">
+                            <strong>Security</strong>
+                            <p>Only grant Super Admin access to trusted personnel.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity Logs -->
+            <section id="activity-logs" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-journal-text"></i> Activity Logs</h2>
+                    <p>View audit trail of all admin actions.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/admin-activity-logs.png" alt="Activity Logs">
+                        <p>Activity Logs</p>
+                    </div>
+
+                    <h3>Log Information</h3>
+                    <ul class="steps">
+                        <li><strong>Admin User</strong> - Who performed the action</li>
+                        <li><strong>Action</strong> - What was done</li>
+                        <li><strong>Target</strong> - What was affected</li>
+                        <li><strong>Timestamp</strong> - When it occurred</li>
+                        <li><strong>IP Address</strong> - Origin of action</li>
+                    </ul>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Retention</strong>
+                            <p>Activity logs are retained for compliance purposes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('show'); }
+
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => { if (scrollY >= section.offsetTop - 100) current = section.getAttribute('id'); });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+            });
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => { if (window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('show'); });
+        });
+    </script>
+</body>
+
+</html>

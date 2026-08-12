@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Management Guide - SMS Expert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #ffffff;
+            --bg-sidebar: #f8f9fa;
+            --bg-card: rgba(0, 0, 0, 0.02);
+            --bg-card-hover: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --accent-pink: #ec4899;
+            --accent-rose: #f472b6;
+            --accent-green: #10b981;
+            --gradient-primary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-logo span { font-weight: 700; font-size: 1.1rem; }
+
+        .sidebar-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.15), rgba(245, 87, 108, 0.15));
+            border: 1px solid rgba(240, 147, 251, 0.3);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--accent-rose);
+            width: 100%;
+        }
+
+        .sidebar-nav { flex: 1; padding: 20px 0; overflow-y: auto; }
+
+        .nav-section {
+            padding: 15px 25px 8px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover { background: var(--bg-card); color: var(--text-primary); }
+        .nav-link.active { background: var(--bg-card); color: var(--accent-rose); border-left-color: var(--accent-pink); }
+        .nav-link i { font-size: 1.1rem; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-footer a:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+        .main-content { margin-left: 280px; min-height: 100vh; }
+
+        .page-header {
+            padding: 60px 50px 50px;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-header h1 i {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .page-header p { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; }
+
+        .content-area { padding: 50px; }
+        .guide-section { margin-bottom: 60px; }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 35px;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover { border-color: rgba(0,0,0,0.1); }
+
+        .section-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .section-card h2 i {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--accent-rose);
+        }
+
+        .section-card > p { color: var(--text-secondary); font-size: 1rem; margin-bottom: 25px; }
+
+        .section-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 30px 0 15px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-card h3:first-of-type { border-top: none; padding-top: 0; margin-top: 25px; }
+
+        .screenshot {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .screenshot img { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .screenshot p { color: var(--text-secondary); font-weight: 600; margin: 10px 0 0 0; font-size: 0.9rem; }
+
+        .steps { list-style: none; padding: 0; counter-reset: step; }
+
+        .steps li {
+            position: relative;
+            padding: 18px 20px 18px 70px;
+            margin-bottom: 12px;
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .steps li:hover { background: rgba(0,0,0,0.03); }
+
+        .steps li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .alert-box {
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .alert-box i { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+
+        .alert-box.tip { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .alert-box.tip i { color: var(--accent-green); }
+
+        .alert-box.warning { background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); }
+        .alert-box.warning i { color: #fbbf24; }
+
+        .alert-box.info { background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.2); }
+        .alert-box.info i { color: var(--accent-pink); }
+
+        .alert-box-content strong { display: block; margin-bottom: 5px; }
+        .alert-box-content p { margin: 0; color: var(--text-secondary); font-size: 0.95rem; }
+
+        .guide-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+
+        .guide-table th {
+            background: rgba(0,0,0,0.04);
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .guide-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .guide-table tr:hover td { background: rgba(0,0,0,0.02); }
+
+        .creds-card {
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .creds-card h4 { display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: 600; color: var(--accent-rose); margin-bottom: 15px; }
+
+        .creds-card .cred-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
+        .creds-card .cred-row:last-child { border-bottom: none; }
+        .creds-card .cred-label { width: 100px; color: var(--text-muted); font-weight: 500; }
+        .creds-card .cred-value { font-family: 'SF Mono', 'Consolas', monospace; background: rgba(0,0,0,0.04); padding: 5px 12px; border-radius: 6px; }
+
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0; }
+
+        .feature-item {
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-item:hover { background: rgba(0,0,0,0.03); }
+        .feature-item h5 { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; }
+        .feature-item h5 i { color: var(--accent-rose); }
+        .feature-item p { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
+
+        .badge { padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-warning { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .badge-info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .badge-primary { background: rgba(236, 72, 153, 0.2); color: #ec4899; }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .page-header, .content-area { padding: 30px; }
+            .page-header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="userguide.html" class="sidebar-logo">
+                <div class="sidebar-logo-icon"><i class="bi bi-chat-square-text-fill"></i></div>
+                <span>SMS Expert</span>
+            </a>
+            <div class="sidebar-badge">
+                <i class="bi bi-megaphone"></i>
+                Campaign Manager
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">Getting Started</div>
+            <a href="#overview" class="nav-link active"><i class="bi bi-grid"></i> Overview</a>
+
+            <div class="nav-section">Create Campaigns</div>
+            <a href="#quick-campaign" class="nav-link"><i class="bi bi-lightning"></i> Quick Campaign</a>
+            <a href="#file-upload" class="nav-link"><i class="bi bi-cloud-upload"></i> File Upload</a>
+            <a href="#file-format" class="nav-link"><i class="bi bi-file-text"></i> File Format</a>
+
+            <div class="nav-section">Manage</div>
+            <a href="#previous" class="nav-link"><i class="bi bi-clock-history"></i> Previous Campaigns</a>
+            <a href="#reports" class="nav-link"><i class="bi bi-bar-chart"></i> Reports</a>
+            <a href="#blacklist" class="nav-link"><i class="bi bi-shield-x"></i> Blacklist</a>
+
+            <div class="nav-section">Accounts</div>
+            <a href="#sub-accounts" class="nav-link"><i class="bi bi-people"></i> Sub-Accounts</a>
+            <a href="#transfer-funds" class="nav-link"><i class="bi bi-arrow-left-right"></i> Transfer Funds</a>
+        </nav>
+
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="bi bi-megaphone"></i> Campaign Management Guide</h1>
+            <p>Create and manage bulk SMS campaigns with file uploads and powerful tracking features.</p>
+        </div>
+
+        <div class="content-area">
+            <!-- Overview -->
+            <section id="overview" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-grid"></i> Campaign Overview</h2>
+                    <p>Send bulk SMS campaigns to large lists of recipients efficiently.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/campaign-dashboard.png" alt="Campaign Dashboard">
+                        <p>Campaign Dashboard</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-lightning"></i> Quick Campaign</h5>
+                            <p>Send immediate campaigns with manual entry</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-cloud-upload"></i> File Upload</h5>
+                            <p>Upload CSV/Excel files for bulk campaigns</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-bar-chart-line"></i> Campaign Tracking</h5>
+                            <p>Monitor progress and download reports</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-calendar-check"></i> Scheduled Campaigns</h5>
+                            <p>Plan campaigns for future delivery</p>
+                        </div>
+                    </div>
+
+                    <h3>Campaign Types Comparison</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Quick Campaign</th>
+                                <th>File Upload</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>Small lists (under 100)</td>
+                                <td>Large lists (100+)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Input Method</strong></td>
+                                <td>Manual entry or paste</td>
+                                <td>CSV/Excel upload</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Personalization</strong></td>
+                                <td>Same message to all</td>
+                                <td>Individual messages per row</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scheduling</strong></td>
+                                <td>Immediate or scheduled</td>
+                                <td>Immediate or scheduled</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Max Recipients</strong></td>
+                                <td>500 per campaign</td>
+                                <td>Unlimited</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Dashboard Statistics</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-send"></i> Total Campaigns</h5>
+                            <p>Number of campaigns created</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-check-circle"></i> Messages Delivered</h5>
+                            <p>Total SMS successfully delivered</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-hourglass-split"></i> In Progress</h5>
+                            <p>Campaigns currently sending</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-percent"></i> Delivery Rate</h5>
+                            <p>Overall campaign success rate</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Pro Tip</strong>
+                            <p>Use File Upload campaigns for better personalization. Each row can have a unique message, allowing dynamic content like names, order numbers, or appointment times.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Campaign -->
+            <section id="quick-campaign" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-lightning"></i> Quick Campaign</h2>
+                    <p>Create and send a campaign by entering recipients directly.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/quick-campaign.png" alt="Quick Campaign Page">
+                        <p>Quick Campaign Page</p>
+                    </div>
+
+                    <h3>Creating a Quick Campaign</h3>
+                    <ul class="steps">
+                        <li>Navigate to <strong>Quick Campaign</strong></li>
+                        <li>Enter a <strong>Campaign Name</strong></li>
+                        <li>Select your <strong>Sender ID</strong></li>
+                        <li>Enter recipient phone numbers (one per line or comma-separated)</li>
+                        <li>Compose your <strong>message</strong></li>
+                        <li>Review the <strong>estimated cost</strong></li>
+                        <li>Click <strong>Submit Campaign</strong></li>
+                    </ul>
+
+                    <h3>Campaign Form Fields</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Campaign Name</strong></td>
+                                <td>Descriptive name for identification (e.g., "March Newsletter")</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sender ID</strong></td>
+                                <td>The name or number recipients will see</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Recipients</strong></td>
+                                <td>Phone numbers in international format</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Message</strong></td>
+                                <td>SMS content (160 chars for standard, 70 for Unicode)</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Schedule</strong></td>
+                                <td>Date/time for future delivery</td>
+                                <td><span class="badge badge-warning">Optional</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Entering Recipients</h3>
+                    <p>You can enter phone numbers in several formats:</p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-list-ol"></i> One Per Line</h5>
+                            <p>Enter each number on a new line</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-comma"></i> Comma Separated</h5>
+                            <p>Separate numbers with commas</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-clipboard"></i> Paste from Excel</h5>
+                            <p>Copy and paste from spreadsheet</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-people"></i> Select Group</h5>
+                            <p>Choose from saved contact groups</p>
+                        </div>
+                    </div>
+
+                    <h3>Cost Estimation</h3>
+                    <p>Before submitting, the system calculates:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Total Recipients</strong></td>
+                                <td>Number of valid phone numbers entered</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Message Parts</strong></td>
+                                <td>Number of SMS parts per message</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Messages</strong></td>
+                                <td>Recipients × Message Parts</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estimated Cost</strong></td>
+                                <td>Total cost based on destination countries</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Important</strong>
+                            <p>Invalid phone numbers are automatically detected and excluded. Review the validation results before submitting.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Best Practice</strong>
+                            <p>Use Quick Campaign for smaller lists (under 100 recipients). For larger lists, use File Upload for better performance and personalization options.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- File Upload -->
+            <section id="file-upload" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-cloud-upload"></i> File Upload Campaign</h2>
+                    <p>Upload CSV or Excel files for bulk SMS campaigns.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/file-upload-campaign.png" alt="File Upload Page">
+                        <p>File Upload Page</p>
+                    </div>
+
+                    <h3>Uploading a Campaign</h3>
+                    <ul class="steps">
+                        <li>Go to <strong>File Upload</strong> section</li>
+                        <li>Download the <strong>sample template</strong></li>
+                        <li>Prepare your file with phone numbers</li>
+                        <li>Enter a <strong>Campaign Name</strong></li>
+                        <li>Select your <strong>Sender ID</strong></li>
+                        <li>Click <strong>Choose File</strong> and select your file</li>
+                        <li>Enter the message template if needed</li>
+                        <li>Submit the campaign</li>
+                    </ul>
+
+                    <h3>Supported File Types</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Format</th>
+                                <th>Extension</th>
+                                <th>Max Size</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>CSV</strong></td>
+                                <td>.csv</td>
+                                <td>50 MB</td>
+                                <td>Recommended for large files</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Excel</strong></td>
+                                <td>.xlsx, .xls</td>
+                                <td>25 MB</td>
+                                <td>First sheet is used</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Text</strong></td>
+                                <td>.txt</td>
+                                <td>50 MB</td>
+                                <td>One number per line</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>File Processing</h3>
+                    <p>After upload, the system performs these validations:</p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-check-circle"></i> Format Check</h5>
+                            <p>Validates file structure and columns</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-telephone"></i> Number Validation</h5>
+                            <p>Checks phone number format</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-x-circle"></i> Duplicate Removal</h5>
+                            <p>Removes duplicate numbers</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-shield-x"></i> Blacklist Check</h5>
+                            <p>Excludes opted-out numbers</p>
+                        </div>
+                    </div>
+
+                    <h3>Upload Results Preview</h3>
+                    <p>Before final submission, you'll see:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Total Rows</strong></td>
+                                <td>Number of rows in your file</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Valid Numbers</strong></td>
+                                <td>Numbers that passed validation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Invalid Numbers</strong></td>
+                                <td>Numbers with format errors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duplicates</strong></td>
+                                <td>Duplicate numbers removed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Blacklisted</strong></td>
+                                <td>Opted-out numbers excluded</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estimated Cost</strong></td>
+                                <td>Total cost for valid numbers</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Message Template Mode</h3>
+                    <p>Choose how to handle message content:</p>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-chat-text"></i> Single Message</h5>
+                            <p>Same message sent to all recipients</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-file-earmark-text"></i> Per-Row Message</h5>
+                            <p>Message column in file for personalization</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-braces"></i> Merge Fields</h5>
+                            <p>Use {name}, {custom1} for personalization</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Important</strong>
+                            <p>Ensure your file follows the correct format. Download the sample template to see the required structure. Incorrect formatting may cause processing failures.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Pro Tip</strong>
+                            <p>Use CSV format for files with more than 10,000 rows for faster processing. Save Excel files as CSV before upload for best performance.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- File Format -->
+            <section id="file-format" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-file-text"></i> File Format</h2>
+                    <p>Your upload file must follow these formatting guidelines.</p>
+
+                    <h3>Column Reference</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Description</th>
+                                <th>Required</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>phone</code></td>
+                                <td>Phone number in international format</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                                <td>+447700900123</td>
+                            </tr>
+                            <tr>
+                                <td><code>message</code></td>
+                                <td>SMS message text (overrides template)</td>
+                                <td><span class="badge badge-warning">Optional</span></td>
+                                <td>Your order #123 is ready</td>
+                            </tr>
+                            <tr>
+                                <td><code>name</code></td>
+                                <td>Recipient name for {name} merge</td>
+                                <td><span class="badge badge-primary">Optional</span></td>
+                                <td>John Smith</td>
+                            </tr>
+                            <tr>
+                                <td><code>custom1</code></td>
+                                <td>Custom field for {custom1} merge</td>
+                                <td><span class="badge badge-primary">Optional</span></td>
+                                <td>ORD-12345</td>
+                            </tr>
+                            <tr>
+                                <td><code>custom2</code></td>
+                                <td>Custom field for {custom2} merge</td>
+                                <td><span class="badge badge-primary">Optional</span></td>
+                                <td>10:30 AM</td>
+                            </tr>
+                            <tr>
+                                <td><code>custom3</code></td>
+                                <td>Custom field for {custom3} merge</td>
+                                <td><span class="badge badge-primary">Optional</span></td>
+                                <td>Branch A</td>
+                            </tr>
+                            <tr>
+                                <td><code>schedule</code></td>
+                                <td>Schedule time per row (YYYY-MM-DD HH:MM)</td>
+                                <td><span class="badge badge-primary">Optional</span></td>
+                                <td>2024-12-25 09:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Sample CSV Structure</h3>
+                    <div style="background: #f1f5f9; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 0.85rem; overflow-x: auto; margin: 20px 0;">
+                        phone,name,message,custom1<br>
+                        +447700900123,John Smith,Hello {name}! Your order {custom1} is ready.,ORD-001<br>
+                        +447700900124,Jane Doe,Hello {name}! Your order {custom1} is ready.,ORD-002<br>
+                        +447700900125,Bob Wilson,Hello {name}! Your order {custom1} is ready.,ORD-003
+                    </div>
+
+                    <h3>Phone Number Formats</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Format</th>
+                                <th>Example</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>International with +</td>
+                                <td>+447700900123</td>
+                                <td><span class="badge badge-success">Recommended</span></td>
+                            </tr>
+                            <tr>
+                                <td>International without +</td>
+                                <td>447700900123</td>
+                                <td><span class="badge badge-success">Accepted</span></td>
+                            </tr>
+                            <tr>
+                                <td>With spaces</td>
+                                <td>+44 7700 900123</td>
+                                <td><span class="badge badge-warning">Auto-cleaned</span></td>
+                            </tr>
+                            <tr>
+                                <td>With dashes</td>
+                                <td>+44-7700-900123</td>
+                                <td><span class="badge badge-warning">Auto-cleaned</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Using Merge Fields</h3>
+                    <p>Personalize messages using merge field placeholders:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Merge Field</th>
+                                <th>Column</th>
+                                <th>Example Usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>{name}</code></td>
+                                <td>name column</td>
+                                <td>"Hello {name}, your appointment is confirmed"</td>
+                            </tr>
+                            <tr>
+                                <td><code>{phone}</code></td>
+                                <td>phone column</td>
+                                <td>"This number ({phone}) has been registered"</td>
+                            </tr>
+                            <tr>
+                                <td><code>{custom1}</code></td>
+                                <td>custom1 column</td>
+                                <td>"Order {custom1} has been shipped"</td>
+                            </tr>
+                            <tr>
+                                <td><code>{custom2}</code></td>
+                                <td>custom2 column</td>
+                                <td>"Appointment at {custom2}"</td>
+                            </tr>
+                            <tr>
+                                <td><code>{custom3}</code></td>
+                                <td>custom3 column</td>
+                                <td>"Visit {custom3} branch"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Common Formatting Errors</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Error</th>
+                                <th>Cause</th>
+                                <th>Solution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Invalid column header</td>
+                                <td>Column name doesn't match expected names</td>
+                                <td>Use exact column names: phone, message, name</td>
+                            </tr>
+                            <tr>
+                                <td>Excel number format</td>
+                                <td>Numbers displayed in scientific notation</td>
+                                <td>Format cells as Text before entering numbers</td>
+                            </tr>
+                            <tr>
+                                <td>Encoding issues</td>
+                                <td>Special characters appear corrupted</td>
+                                <td>Save file as UTF-8 encoded CSV</td>
+                            </tr>
+                            <tr>
+                                <td>Empty rows</td>
+                                <td>Blank rows between data</td>
+                                <td>Remove all empty rows from file</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Download Templates</strong>
+                            <p>Use the download links on the campaign page to get sample CSV and Excel templates. These templates include all supported columns with example data.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Excel Tip</strong>
+                            <p>Format the phone number column as "Text" before entering data to prevent Excel from removing leading zeros or converting to scientific notation.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Previous Campaigns -->
+            <section id="previous" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-clock-history"></i> Previous Campaigns</h2>
+                    <p>View and manage all submitted campaigns with status tracking.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/previous-campaigns.png" alt="Previous Campaigns">
+                        <p>Previous Campaigns</p>
+                    </div>
+
+                    <h3>Campaign Status Types</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Description</th>
+                                <th>Actions Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-info">Queued</span></td>
+                                <td>Waiting to start processing</td>
+                                <td>Cancel, View Details</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-primary">Processing</span></td>
+                                <td>Actively sending messages</td>
+                                <td>Pause, View Progress</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">Paused</span></td>
+                                <td>Temporarily stopped by user</td>
+                                <td>Resume, Cancel</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">Completed</span></td>
+                                <td>All messages sent</td>
+                                <td>Download Report, View Stats</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-danger">Failed</span></td>
+                                <td>Campaign encountered an error</td>
+                                <td>View Error, Retry</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-secondary">Scheduled</span></td>
+                                <td>Waiting for scheduled time</td>
+                                <td>Edit Schedule, Cancel</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Campaign List Columns</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Column</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Campaign Name</strong></td>
+                                <td>Name you assigned when creating</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Created</strong></td>
+                                <td>Date and time campaign was submitted</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td>Total number of recipients</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sent</strong></td>
+                                <td>Messages successfully sent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Delivered</strong></td>
+                                <td>Messages confirmed delivered</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Failed</strong></td>
+                                <td>Messages that failed to deliver</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Progress</strong></td>
+                                <td>Visual progress bar</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost</strong></td>
+                                <td>Total amount spent on campaign</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Campaign Actions</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-eye"></i> View Details</h5>
+                            <p>See full campaign information and message breakdown</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-pause-circle"></i> Pause/Resume</h5>
+                            <p>Temporarily stop or continue sending</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-download"></i> Download Report</h5>
+                            <p>Export detailed delivery report as CSV</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-arrow-repeat"></i> Duplicate</h5>
+                            <p>Create a new campaign with same settings</p>
+                        </div>
+                    </div>
+
+                    <h3>Filtering Campaigns</h3>
+                    <p>Use filters to find specific campaigns:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Filter</th>
+                                <th>Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Date Range</strong></td>
+                                <td>Filter by creation date</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status</strong></td>
+                                <td>All, Queued, Processing, Completed, Failed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Search</strong></td>
+                                <td>Search by campaign name</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sender ID</strong></td>
+                                <td>Filter by sender ID used</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Tip</strong>
+                            <p>Use descriptive campaign names that include the date or purpose (e.g., "March-2024-Newsletter" or "Appointment-Reminders-Week10") for easy identification later.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports -->
+            <section id="reports" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-bar-chart"></i> Campaign Reports</h2>
+                    <p>Download detailed reports with delivery status for each message.</p>
+
+                    <h3>Downloading Reports</h3>
+                    <ul class="steps">
+                        <li>Go to <strong>Previous Campaigns</strong></li>
+                        <li>Find the completed campaign</li>
+                        <li>Click <strong>Download Report</strong></li>
+                        <li>Select the report format (CSV or Excel)</li>
+                        <li>Save the file to your computer</li>
+                    </ul>
+
+                    <h3>Report Contents</h3>
+                    <p>The delivery report includes the following fields:</p>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Column</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Phone</strong></td>
+                                <td>Recipient phone number</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Message</strong></td>
+                                <td>SMS content sent to this recipient</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status</strong></td>
+                                <td>Delivery status (Delivered, Failed, Pending)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Error Code</strong></td>
+                                <td>Error code if failed (blank if successful)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Error Message</strong></td>
+                                <td>Human-readable error description</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sent Time</strong></td>
+                                <td>Timestamp when message was sent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Delivered Time</strong></td>
+                                <td>Timestamp when delivery confirmed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Parts</strong></td>
+                                <td>Number of SMS parts used</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost</strong></td>
+                                <td>Cost charged for this message</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Report Types</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-file-earmark-spreadsheet"></i> Full Report</h5>
+                            <p>All recipients with complete details</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-check-circle"></i> Delivered Only</h5>
+                            <p>Only successfully delivered messages</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-x-circle"></i> Failed Only</h5>
+                            <p>Only failed messages for retry</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-graph-up"></i> Summary</h5>
+                            <p>Aggregate statistics overview</p>
+                        </div>
+                    </div>
+
+                    <h3>Understanding Delivery Statistics</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Calculation</th>
+                                <th>Good Target</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Delivery Rate</strong></td>
+                                <td>Delivered ÷ Total Sent × 100</td>
+                                <td>> 95%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Failure Rate</strong></td>
+                                <td>Failed ÷ Total Sent × 100</td>
+                                <td>< 5%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Avg Delivery Time</strong></td>
+                                <td>Average time to delivery confirmation</td>
+                                <td>< 30 seconds</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost per Delivered</strong></td>
+                                <td>Total Cost ÷ Delivered Messages</td>
+                                <td>Varies by destination</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Report Availability</strong>
+                            <p>Campaign reports are available for download for 12 months after completion. Export and save important reports for long-term records.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Tip</strong>
+                            <p>Download the "Failed Only" report and use it for a retry campaign. This helps maximize your delivery rate while only paying for messages that need to be resent.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blacklist -->
+            <section id="blacklist" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-shield-x"></i> Blacklist Management</h2>
+                    <p>View phone numbers that have opted out (sent STOP command).</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/campaign-blacklist.png" alt="Blacklist Page">
+                        <p>Blacklist Page</p>
+                    </div>
+
+                    <h3>Understanding Blacklist</h3>
+                    <p>The blacklist contains phone numbers that have requested to stop receiving messages. These are added automatically when recipients:</p>
+                    <ul class="steps">
+                        <li>Reply with <strong>STOP</strong> to any message</li>
+                        <li>Reply with <strong>UNSUBSCRIBE</strong> to opt out</li>
+                        <li>Reply with <strong>CANCEL</strong> or <strong>QUIT</strong></li>
+                        <li>Are manually added by you</li>
+                    </ul>
+
+                    <h3>Blacklist Information</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Phone Number</strong></td>
+                                <td>The opted-out phone number</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Date Added</strong></td>
+                                <td>When the number was blacklisted</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Source</strong></td>
+                                <td>How it was added (STOP reply, Manual, API)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Keyword</strong></td>
+                                <td>The keyword they replied to (if applicable)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Managing Blacklist</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <h5><i class="bi bi-search"></i> Search</h5>
+                            <p>Find specific numbers in the blacklist</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-person-plus"></i> Add Number</h5>
+                            <p>Manually add a number to blacklist</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-person-x"></i> Remove Number</h5>
+                            <p>Remove a number (if requested)</p>
+                        </div>
+                        <div class="feature-item">
+                            <h5><i class="bi bi-download"></i> Export</h5>
+                            <p>Download full blacklist as CSV</p>
+                        </div>
+                    </div>
+
+                    <h3>Compliance Requirements</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Honor Opt-Outs</strong></td>
+                                <td>Never send to blacklisted numbers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Process Within 24hrs</strong></td>
+                                <td>Stop requests must be honored promptly</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Include Opt-Out Info</strong></td>
+                                <td>Marketing messages should include "Reply STOP to opt out"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Maintain Records</strong></td>
+                                <td>Keep records of opt-outs for compliance</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Re-subscribing</h3>
+                    <p>If a recipient wants to re-subscribe after opting out:</p>
+                    <ul class="steps">
+                        <li>Recipient sends <strong>START</strong> or <strong>SUBSCRIBE</strong> to your number</li>
+                        <li>You can manually remove them from the blacklist</li>
+                        <li>They will then receive messages again</li>
+                    </ul>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Important</strong>
+                            <p>Sending messages to opted-out numbers violates compliance regulations and may result in account suspension. Always respect opt-out requests.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Compliance</strong>
+                            <p>Blacklisted numbers are automatically excluded from all campaigns. You cannot accidentally send to these numbers through the platform.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Best Practice</strong>
+                            <p>Regularly export your blacklist for backup. Include clear opt-out instructions in your marketing messages to maintain trust with your recipients.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sub-accounts" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-people"></i> Sub-Accounts</h2>
+                    <p>A <strong>master account</strong> can create one or more <strong>sub-accounts</strong> &mdash; separate logins that sit under your account, each with its own username, password and wallet. This is useful for separating departments, clients or teams. You can move money to a sub-account at any time (see <a href="#transfer-funds">Transfer Money Between Accounts</a>).</p>
+
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="alert-box-content">
+                            <strong>Master accounts only</strong>
+                            <p>Only a master account can create sub-accounts. If you are signed in to a sub-account, the &ldquo;Add Sub-Account&rdquo; button will not appear.</p>
+                        </div>
+                    </div>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/accounts-overview.png" alt="Accounts page with the Add Sub-Account button">
+                        <p>The Accounts page &mdash; master accounts see the &ldquo;Add Sub-Account&rdquo; button</p>
+                    </div>
+
+                    <h3>How to Add a Sub-Account</h3>
+                    <ul class="steps">
+                        <li>Open the <strong>Accounts</strong> page from the Campaign Manager menu</li>
+                        <li>Click <strong>Add Sub-Account</strong> (top right)</li>
+                        <li>Fill in the new account&rsquo;s details (see the table below)</li>
+                        <li>Click <strong>Create Sub-Account</strong></li>
+                        <li>The system generates a <strong>username and password</strong> for the new sub-account &mdash; copy these and share them securely with the user</li>
+                    </ul>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/add-subaccount.png" alt="Add New Sub-Account form">
+                        <p>The &ldquo;Add New Sub-Account&rdquo; form</p>
+                    </div>
+
+                    <h3>Sub-Account Fields</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Contact Name</strong></td>
+                                <td>The name of the person who will use the sub-account.</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Business Name</strong></td>
+                                <td>The business or department name for the sub-account.</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email Address</strong></td>
+                                <td>A valid email address for the sub-account holder.</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone Number</strong></td>
+                                <td>A contact telephone number.</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mobile Number</strong></td>
+                                <td>A mobile number for the sub-account holder.</td>
+                                <td><span class="badge badge-warning">Optional</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>After creating a sub-account</strong>
+                            <p>The new sub-account appears in your Accounts list beneath the master. Its wallet starts at &pound;0.00 &mdash; use <a href="#transfer-funds">Transfer Money Between Accounts</a> to top it up so it can send messages.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="transfer-funds" class="guide-section">
+                <div class="section-card">
+                    <h2><i class="bi bi-arrow-left-right"></i> Transfer Money Between Accounts</h2>
+                    <p>If you manage a master account with one or more sub-accounts, you can move wallet funds (money) between them instantly &mdash; for example, topping up a sub-account from the master, or pulling unused balance back. This is done from the <strong>Accounts</strong> page in the Campaign Manager.</p>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/accounts-overview.png" alt="Accounts page showing wallet balances">
+                        <p>Accounts page &mdash; each account shows its current wallet balance</p>
+                    </div>
+
+                    <h3>How to Transfer Funds</h3>
+                    <ul class="steps">
+                        <li>Open the <strong>Accounts</strong> page from the Campaign Manager menu</li>
+                        <li>Scroll to the <strong>Transfer Wallet Funds Between Accounts</strong> panel</li>
+                        <li>Choose the <strong>From Account</strong> &mdash; the account the money is taken from (its current balance is shown beside each name)</li>
+                        <li>Choose the <strong>To Account</strong> &mdash; the account that will receive the money</li>
+                        <li>Enter the <strong>Amount (&pound;)</strong> you want to transfer</li>
+                        <li>Click <strong>Transfer</strong></li>
+                    </ul>
+
+                    <div class="screenshot">
+                        <img src="userguide-screenshots/transfer-funds.png" alt="Transfer Wallet Funds Between Accounts form">
+                        <p>The &ldquo;Transfer Wallet Funds Between Accounts&rdquo; panel</p>
+                    </div>
+
+                    <h3>Transfer Fields</h3>
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>From Account</strong></td>
+                                <td>The account the funds are taken from. Must have enough balance to cover the amount.</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>To Account</strong></td>
+                                <td>The account that receives the funds.</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Amount (&pound;)</strong></td>
+                                <td>The amount to move, in pounds (e.g. 25.00). Must be greater than zero.</td>
+                                <td><span class="badge badge-success">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert-box tip">
+                        <i class="bi bi-lightbulb"></i>
+                        <div class="alert-box-content">
+                            <strong>Instant &amp; free</strong>
+                            <p>Transfers happen immediately &mdash; both balances update straight away and a confirmation message is shown. There is no charge for moving money between your own accounts.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div class="alert-box-content">
+                            <strong>Before you transfer</strong>
+                            <p>You can only transfer between accounts you manage (your master and its sub-accounts). The <strong>From</strong> account must have sufficient balance, and the <strong>From</strong> and <strong>To</strong> accounts must be different. Every transfer is logged for your records.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('show'); }
+
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => { if (scrollY >= section.offsetTop - 100) current = section.getAttribute('id'); });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+            });
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => { if (window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('show'); });
+        });
+    </script>
+</body>
+</html>

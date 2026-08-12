@@ -1,0 +1,998 @@
+{
+	"info": {
+		"_postman_id": "sms-expert-mobile-api",
+		"name": "SMS Expert - Mobile API",
+		"description": "Mobile App API for SMS Expert Platform\n\n## Authentication\nAll endpoints except Login require Bearer Token authentication.\n\n## How to Use\n1. Call the Login endpoint first\n2. Copy the token from response\n3. The token will be automatically set for other requests\n\n## Base URL\nUpdate the `base_url` variable in collection variables.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api/mobile",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.status === true && jsonData.data && jsonData.data.token) {",
+									"    pm.collectionVariables.set('token', jsonData.data.token);",
+									"    console.log('Token saved successfully!');",
+									"}",
+									"",
+									"pm.test('Login successful', function () {",
+									"    pm.expect(jsonData.status).to.eql(true);",
+									"});",
+									"",
+									"pm.test('Token received', function () {",
+									"    pm.expect(jsonData.data.token).to.not.be.undefined;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"your_username\",\n    \"password\": \"your_password\",\n    \"device_name\": \"Postman Test\",\n    \"device_id\": \"postman-device-001\",\n    \"fcm_token\": \"optional-firebase-token\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login to get authentication token.\n\n**Note:** Token is automatically saved to collection variables after successful login."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"testuser\",\n    \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"status\": true,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"user\": {\n            \"id\": 1,\n            \"bigid\": \"12345\",\n            \"username\": \"testuser\",\n            \"contact_name\": \"John Doe\",\n            \"wallet_balance\": 150.50\n        },\n        \"token\": \"1|abc123xyz789...\",\n        \"token_type\": \"Bearer\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout from current device and revoke token."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout All Devices",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout-all"
+							]
+						},
+						"description": "Logout from all devices and revoke all tokens."
+					},
+					"response": []
+				},
+				{
+					"name": "Check Auth Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/check",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"check"
+							]
+						},
+						"description": "Check if current token is valid and get basic user info."
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.status === true && jsonData.data && jsonData.data.token) {",
+									"    pm.collectionVariables.set('token', jsonData.data.token);",
+									"    console.log('New token saved!');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/refresh-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh-token"
+							]
+						},
+						"description": "Get a new token. Old token is revoked."
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"oldpassword\",\n    \"new_password\": \"newpassword123\",\n    \"new_password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						},
+						"description": "Change user password."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Push Token (FCM)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fcm_token\": \"your-firebase-cloud-messaging-token\",\n    \"device_id\": \"unique-device-identifier\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/push-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"push-token"
+							]
+						},
+						"description": "Update Firebase Cloud Messaging token for push notifications."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for login, logout, and token management."
+		},
+		{
+			"name": "User Profile",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"profile"
+							]
+						},
+						"description": "Get complete user profile information."
+					},
+					"response": []
+				}
+			],
+			"description": "User profile management endpoints."
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						},
+						"description": "Get dashboard overview with wallet, stats, and recent activity."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Wallet",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/wallet",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"wallet"
+							]
+						},
+						"description": "Get wallet balance details."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/stats?period=month",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"stats"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "month",
+									"description": "Options: day, week, month, year"
+								}
+							]
+						},
+						"description": "Get SMS statistics for a period."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Monthly Counts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/monthly-counts?year=2024",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"monthly-counts"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024",
+									"description": "Year for monthly data"
+								}
+							]
+						},
+						"description": "Get monthly SMS counts for charts."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Daily Counts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/daily-counts?year=2024&month=12",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"daily-counts"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "12",
+									"description": "Month number 1-12"
+								}
+							]
+						},
+						"description": "Get daily SMS counts for a specific month."
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard data and statistics endpoints."
+		},
+		{
+			"name": "SMS",
+			"item": [
+				{
+					"name": "Send SMS",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"to\": \"447912345678\",\n    \"message\": \"Hello from SMS Expert Mobile App!\",\n    \"from\": \"MyCompany\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sms/send",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sms",
+								"send"
+							]
+						},
+						"description": "Send an SMS message.\n\n**Parameters:**\n- `to` (required): Recipient phone number\n- `message` (required): SMS content (max 1600 chars)\n- `from` (optional): Sender ID (max 11 chars)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get SMS History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sms/history?page=1&per_page=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sms",
+								"history"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20",
+									"description": "Max 100"
+								},
+								{
+									"key": "status",
+									"value": "DELIVRD",
+									"description": "Filter: DELIVRD, PENDING, FAILED",
+									"disabled": true
+								},
+								{
+									"key": "date_from",
+									"value": "2024-12-01",
+									"disabled": true
+								},
+								{
+									"key": "date_to",
+									"value": "2024-12-31",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "447",
+									"description": "Search in recipient, message, sender",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get SMS history with optional filters."
+					},
+					"response": []
+				},
+				{
+					"name": "Get SMS Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sms/12345",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sms",
+								"12345"
+							]
+						},
+						"description": "Get details of a specific SMS by ID."
+					},
+					"response": []
+				}
+			],
+			"description": "SMS sending and history endpoints."
+		},
+		{
+			"name": "Contacts",
+			"item": [
+				{
+					"name": "Get All Contacts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/contacts?page=1&per_page=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "50"
+								},
+								{
+									"key": "search",
+									"value": "john",
+									"disabled": true
+								},
+								{
+									"key": "group_id",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all contacts with optional search and group filter."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Contact",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/contacts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts",
+								"1"
+							]
+						},
+						"description": "Get a single contact by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Contact",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"phone\": \"447912345678\",\n    \"email\": \"john@example.com\",\n    \"notes\": \"Important client\",\n    \"group_id\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/contacts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts"
+							]
+						},
+						"description": "Create a new contact."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Contact",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"phone\": \"447912345679\",\n    \"email\": \"john.updated@example.com\",\n    \"notes\": \"Updated notes\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/contacts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts",
+								"1"
+							]
+						},
+						"description": "Update an existing contact."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Contact",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/contacts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts",
+								"1"
+							]
+						},
+						"description": "Delete a contact."
+					},
+					"response": []
+				}
+			],
+			"description": "Contact management (address book) endpoints."
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get All Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications?page=1&per_page=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								},
+								{
+									"key": "unread_only",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all notifications."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/unread-count",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"unread-count"
+							]
+						},
+						"description": "Get count of unread notifications."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/1/read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"1",
+								"read"
+							]
+						},
+						"description": "Mark a notification as read."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark All as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/mark-all-read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"mark-all-read"
+							]
+						},
+						"description": "Mark all notifications as read."
+					},
+					"response": []
+				}
+			],
+			"description": "Notification management endpoints."
+		},
+		{
+			"name": "Token Validation (Test)",
+			"item": [
+				{
+					"name": "Get User from Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/token-test/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"token-test",
+								"user"
+							]
+						},
+						"description": "Test endpoint to demonstrate getting user from token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by BigID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/token-test/user-by-bigid",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"token-test",
+								"user-by-bigid"
+							]
+						},
+						"description": "Test endpoint to get user by bigid from token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Token Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/token-test/current-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"token-test",
+								"current-token"
+							]
+						},
+						"description": "Get information about current token and all user tokens."
+					},
+					"response": []
+				},
+				{
+					"name": "Validate with Permissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/token-test/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"token-test",
+								"validate"
+							]
+						},
+						"description": "Validate token and check user permissions."
+					},
+					"response": []
+				},
+				{
+					"name": "Manual Token Validation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/validate-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"validate-token"
+							]
+						},
+						"description": "Manually validate token without middleware."
+					},
+					"response": []
+				}
+			],
+			"description": "Test endpoints demonstrating token validation."
+		}
+	]
+}
