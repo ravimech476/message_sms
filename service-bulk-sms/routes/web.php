@@ -13,6 +13,7 @@
 
 use App\Http\Controllers\Admin\MessagesController;
 use App\Http\Controllers\Admin\PracticesController;
+use App\Http\Controllers\Admin\SmsLogController;
 use App\Http\Controllers\Receipts\ReceiptHandlerController;
 
 Route::middleware('auth')->group(function(){
@@ -20,6 +21,7 @@ Route::middleware('auth')->group(function(){
     Route::get('/practices', [PracticesController::class, 'index'])->name('practices');
     Route::post('/practices/update', [PracticesController::class, 'update'])->name('practices.update');
     Route::get('/messages', [MessagesController::class, 'index'])->name('messages');
+    Route::get('/sms-log', [SmsLogController::class, 'index'])->name('sms-log');
 });
 
 Route::any('receipts', ReceiptHandlerController::class);

@@ -61,8 +61,27 @@ services:
     depends_on:
       - php
 
+  # RabbitMQ broker for the SMPP pipeline (SMS outbound + DLR queues).
+  # Host ports use 5673/15673 to avoid clashing with the host's own RabbitMQ (5672/15672).
+  # Inside the footfall network the app connects to  rabbitmq:5672  (container name, internal port).
+  rabbitmq:
+    image: "rabbitmq:3.13-management"
+    ports:
+      - "5673:5672"     # AMQP  (host:container)
+      - "15673:15672"   # Management UI → http://localhost:15673  (guest/guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - "rabbitmqdata:/var/lib/rabbitmq"
+    container_name: silicon-sms-rabbitmq
+    networks:
+      - footfall
+
 volumes:
   mysqldata:
+    driver: local
+  rabbitmqdata:
     driver: local
 
 # Networks

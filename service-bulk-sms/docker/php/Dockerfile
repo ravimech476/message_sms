@@ -1,4 +1,5 @@
-# Pinned to 3.15: last Alpine release shipping php7 packages
+# Alpine 3.15 ships PHP 8.0 (php8 packages). PHP 8.0 = the sweet spot:
+# Laravel 6 supports up to 8.0, and php-smpp/php-amqplib both run on it.
 FROM alpine:3.15
 
 # Set the working directory
@@ -6,23 +7,33 @@ WORKDIR /app
 
 RUN apk add --update libcurl curl libxml2-dev libsodium-dev
 
-# Install PHP and various php dependencies
-RUN apk add php7 php7-fileinfo php7-intl php7-bz2 php7-apcu php7-fpm php7-openssl php7-pdo_mysql \
-    php7-mbstring php7-tokenizer php7-xml php7-ctype php7-pdo_sqlite php7-sqlite3 \
-    php7-json php7-iconv php7-session php7-dom  php7-curl php7-bcmath \
-    php7-xmlwriter zlib php7-phar php7-zip php7-mysqli php7-simplexml php7-sodium php7-pecl-imagick php7-imagick imagemagick openssh-client
+# Install PHP 8 and extensions.
+#  - sockets : required by php-smpp (SMPP binary protocol over TCP)
+#  - pcntl + posix : required by the long-running SMPP DLR receivers (signal handling)
+#  - bcmath : required by php-amqplib (large-number handling)
+#  NOTE: json is built into PHP 8 core (no separate php8-json package).
+RUN apk add php8 php8-fpm php8-sockets php8-pcntl php8-posix \
+    php8-fileinfo php8-intl php8-bz2 php8-apcu php8-openssl php8-pdo_mysql \
+    php8-mbstring php8-tokenizer php8-xml php8-ctype php8-pdo_sqlite php8-sqlite3 \
+    php8-iconv php8-session php8-dom php8-curl php8-bcmath \
+    php8-xmlwriter zlib php8-phar php8-zip php8-mysqli php8-simplexml php8-sodium \
+    php8-pecl-imagick imagemagick openssh-client
+
+# Alpine installs the PHP 8 CLI as `php8`. Symlink `php` so composer (env php shebang),
+# `php artisan`, and every `php` invocation work.
+RUN ln -sf /usr/bin/php8 /usr/bin/php
 
 # Configure php.ini
-RUN sed -i "s|;*max_execution_time\s*=\s*30|max_execution_time = 60|g" /etc/php7/php.ini
+RUN sed -i "s|;*max_execution_time\s*=\s*30|max_execution_time = 60|g" /etc/php8/php.ini
 
 # Configure php-fpm.conf
-RUN sed -i "s|;*daemonize\s*=\s*yes|daemonize = no|g" /etc/php7/php-fpm.conf && \
-    sed -i "s|;*error_log\s*=\s*log/php7/error.log|error_log = /proc/self/fd/2|g" /etc/php7/php-fpm.conf
+RUN sed -i "s|;*daemonize\s*=\s*yes|daemonize = no|g" /etc/php8/php-fpm.conf && \
+    sed -i "s|;*error_log\s*=\s*log/php8/error.log|error_log = /proc/self/fd/2|g" /etc/php8/php-fpm.conf
 
 # Configure www.conf
-RUN sed -i "s|;*listen\s*=\s*127.0.0.1:9000|listen = 0.0.0.0:9000|g" /etc/php7/php-fpm.d/www.conf && \
-    sed -i "s|;*clear_env\s*=\s*no|clear_env = no|g" /etc/php7/php-fpm.d/www.conf && \
-    echo "catch_workers_output = yes" >> /etc/php7/php-fpm.d/www.conf
+RUN sed -i "s|;*listen\s*=\s*127.0.0.1:9000|listen = 0.0.0.0:9000|g" /etc/php8/php-fpm.d/www.conf && \
+    sed -i "s|;*clear_env\s*=\s*no|clear_env = no|g" /etc/php8/php-fpm.d/www.conf && \
+    echo "catch_workers_output = yes" >> /etc/php8/php-fpm.d/www.conf
 
 
 # Clean apk cache
@@ -42,13 +53,12 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer && \
 # Copy the application
 COPY . /app
 
-# Run composer install
-RUN composer install --no-dev --no-scripts --no-autoloader
-
-RUN composer dump-autoload --optimize
+# NOTE: composer dependencies are installed at RUNTIME inside the container
+# (the compose volume `.:/app` shadows any vendor baked in here). This also lets us
+# regenerate the lock for PHP 8.0 without failing the image build.
 
 # Expose the PHP-fpm port
 EXPOSE 9000
 
 # Run php fpm in the foreground
-CMD [ "php-fpm7", "-F" ]
+CMD [ "php-fpm8", "-F" ]
