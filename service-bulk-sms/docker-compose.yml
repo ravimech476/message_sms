@@ -61,6 +61,22 @@ services:
     depends_on:
       - php
 
+  # SMPP binder fleet (production parity): 5 senders + 10 DLR receiver banks +
+  # DLR buffer processor, supervisor-managed (autorestart). Installs supervisor at
+  # start (no image rebuild). = up to 15 Vonage binds on SMPP_SYSTEM_ID.
+  smpp-workers:
+    entrypoint: sh -c "apk add --no-cache supervisor && exec supervisord -c /app/docker/supervisor/supervisord.conf"
+    image: silicon/silicon-sms-php
+    volumes:
+      - ".:/app"
+    container_name: silicon-sms-smpp-workers
+    depends_on:
+      - php
+      - rabbitmq
+      - mysql
+    networks:
+      - footfall
+
   # RabbitMQ broker for the SMPP pipeline (SMS outbound + DLR queues).
   # Host ports use 5673/15673 to avoid clashing with the host's own RabbitMQ (5672/15672).
   # Inside the footfall network the app connects to  rabbitmq:5672  (container name, internal port).

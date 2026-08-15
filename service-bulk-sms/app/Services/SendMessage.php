@@ -7,7 +7,9 @@ use App\Mail\FallbackEmail;
 use App\Models\Message;
 use App\Models\MessageUpdate;
 use App\Models\Practice;
+use App\Services\Smpp\SmppService;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class SendMessage
@@ -47,6 +49,13 @@ class SendMessage
     public function send($data)
     {
         try {
+            // From now on Vonage sends go through the SMPP pipeline (smsg_log),
+            // not the Vonage REST API. All other drivers keep the REST path.
+            if ($this->usesSmpp()) {
+                $this->sendViaSmpp($data);
+                return;
+            }
+
             $messageProvider = $this->getDriver();
 
             if (!$messageProvider || !class_exists($messageProvider)) {
@@ -64,6 +73,115 @@ class SendMessage
 
             $this->fallbackToEmail($data);
         }
+    }
+
+    /** True when this provider should send over SMPP instead of the REST API. */
+    protected function usesSmpp(): bool
+    {
+        return strtolower((string) $this->provider->getOriginal('provider')) === 'vonage';
+    }
+
+    /**
+     * Send via the SMPP pipeline. Two modes (config('messages.smpp_async')):
+     *   async=true  → create smsg_log row + publish to RabbitMQ sms.outbound; the
+     *                 smpp:consume binder sends it (production parity).
+     *   async=false → open an SMPP bind and send inline.
+     *
+     * Note: per-practice Vonage REST credentials are NOT used here — every practice
+     * sends through the one shared SMPP account (SMPP_SYSTEM_ID), same as sms_expert.
+     */
+    protected function sendViaSmpp($data)
+    {
+        if (config('messages.smpp_async', true)) {
+            $this->sendViaSmppQueue($data);
+            return;
+        }
+
+        $this->sendViaSmppDirect($data);
+    }
+
+    /** Create the smsg_log row and enqueue a plain pending row for the pipeline. */
+    protected function createSmsgLogRow($to, $from, $message): int
+    {
+        $now = now()->format('YmdHis');
+
+        return DB::table('smsg_log')->insertGetId([
+            'bigid'          => '',
+            'mobnum'         => $to,
+            'text'           => urlencode($message),
+            'sentstatustext' => '',
+            'originator'     => $from,
+            'numparts'       => 1,
+            'timesubmitted'  => $now,
+            'dosendtime'     => $now,
+            'sentstatus'     => 'pending',
+            'initiator'      => 'SMPP',
+            'suppliername'   => 'Vonage SMPP',
+            'dayofyear'      => now()->format('Ymd'),
+        ]);
+    }
+
+    /** Production path: publish to RabbitMQ; smpp:consume binder does the actual send. */
+    protected function sendViaSmppQueue($data)
+    {
+        $to      = $data['to'];
+        $message = $data['message'];
+        $from    = $this->provider->sender_identifier ?: $this->practice->practice_name;
+
+        $smsgLogId = $this->createSmsgLogRow($to, $from, $message);
+
+        $rabbit = app(\App\Services\Queue\RabbitMQService::class);
+        $ok = $rabbit->publishToQueue(config('rabbitmq.queues.outbound', 'sms.outbound'), [
+            'smsg_log_id' => $smsgLogId,
+            'to'          => $to,
+            'from'        => $from,
+            'message'     => $message,
+        ]);
+        $rabbit->close();
+
+        if (!$ok) {
+            DB::table('smsg_log')->where('id', $smsgLogId)->update([
+                'sentstatus'     => 'fail',
+                'sentstatustext' => 'Failed to publish to sms.outbound queue',
+            ]);
+            throw new Exception('Failed to publish SMS to the SMPP queue');
+        }
+
+        // Accepted for delivery; the binder + DLR flow finish it in smsg_log / SMS Log.
+        $this->updateMessage('sent', "Queued to SMPP pipeline (smsg_log #{$smsgLogId})");
+    }
+
+    /** Inline path: open an SMPP bind and send now (no RabbitMQ, no binder needed). */
+    protected function sendViaSmppDirect($data)
+    {
+        $to      = $data['to'];
+        $message = $data['message'];
+        $from    = $this->provider->sender_identifier ?: $this->practice->practice_name;
+
+        $smsgLogId = $this->createSmsgLogRow($to, $from, $message);
+
+        $smpp = new SmppService();
+        try {
+            $smpp->connect();
+            $messageId = $smpp->sendSms($to, $message, $from);
+            $smpp->close();
+        } catch (Exception $e) {
+            $smpp->close();
+            DB::table('smsg_log')->where('id', $smsgLogId)->update([
+                'sentstatus'     => 'fail',
+                'sentstatustext' => substr($e->getMessage(), 0, 250),
+            ]);
+            throw $e; // outer catch records the MessageUpdate 'failed' + email fallback
+        }
+
+        DB::table('smsg_log')->where('id', $smsgLogId)->update([
+            'sentstatus'              => 'ok',
+            'timesent'                => now()->format('YmdHis'),
+            'deliveryreceipt1'        => $messageId,
+            'onesixty_suppliermsgref' => $messageId,
+        ]);
+
+        $this->updateMessage('sent', "SMPP message_id: {$messageId} (smsg_log #{$smsgLogId})");
     }
 
     /**

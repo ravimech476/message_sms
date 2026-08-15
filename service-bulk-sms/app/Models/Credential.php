@@ -44,12 +44,20 @@ class Credential extends Model
      */
     public function getValueAttribute()
     {
-        if ($this->attributes['value']) {
+        if (empty($this->attributes['value'])) {
+            return null;
+        }
+
+        try {
             $key = Key::loadFromAsciiSafeString(config('messages.defuse_key'));
 
             return Crypto::decrypt(bin2hex($this->attributes['value']), $key, false);
-        }
+        } catch (\Throwable $e) {
+            // A single unreadable credential (legacy/plaintext/key-mismatch) must not
+            // 500 the whole practices listing — surface it as null and move on.
+            \Log::warning('Credential decrypt failed for id ' . ($this->attributes['id'] ?? '?') . ': ' . $e->getMessage());
 
-        return null;
+            return null;
+        }
     }
 }
