@@ -46,6 +46,10 @@ class SmppDlrReceiver extends Command
             $ok = $status->apply($dlr);
             $ok ? $matched++ : null;
             $this->line("  ← DLR id={$dlr['message_id']} stat={$dlr['status']} " . ($ok ? 'matched' : 'no-match'));
+            \App\Services\Logging\ComponentLogger::smpp()->info('DLR received', [
+                'id' => $dlr['message_id'] ?? null, 'status' => $dlr['status'] ?? null,
+                'matched' => $ok, 'bank' => $this->option('bank'),
+            ]);
         }, $seconds);
 
         $smpp->close();

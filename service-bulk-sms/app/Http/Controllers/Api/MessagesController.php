@@ -40,6 +40,13 @@ class MessagesController extends Controller
 
         ProcessMessage::dispatch($practice, $message, $messageRequest->validated());
 
+        \App\Services\Logging\ComponentLogger::api()->info('POST /messages — dispatched', [
+            'domain'     => $messageRequest->get('domain'),
+            'to'         => $messageRequest->get('to'),
+            'message_id' => $message->id,
+            'provider'   => $provider->getOriginal('provider'),
+        ]);
+
         return (new MessageResource($message))->additional(['message' => 'Message has been dispatched.']);
     }
 

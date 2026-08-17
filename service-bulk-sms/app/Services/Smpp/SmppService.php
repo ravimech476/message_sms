@@ -44,6 +44,9 @@ class SmppService
     private ?string $bankKey;
     private int $seqMin = 1;
     private int $seqMax = 0x7FFFFFFF;
+    private ?string $lastSubmissionPrice = null;
+    private ?int $concatRefSlotBase = null;   // per-worker slice of the 0-255 concat-reference space
+    private int $concatRefCounter = 0;
 
     public bool $debug = false;
 
@@ -130,6 +133,10 @@ class SmppService
 
         $this->bound = true;
         $this->log(($receiver ? 'bind_receiver' : 'bind_transmitter') . ' OK');
+        \App\Services\Logging\ComponentLogger::smpp()->info(
+            ($receiver ? 'bind_receiver' : 'bind_transmitter') . ' OK',
+            ['host' => $this->host, 'system_id' => $this->systemId, 'bank' => $this->bankKey]
+        );
         return true;
     }
 
@@ -264,6 +271,13 @@ class SmppService
         $to = ltrim(preg_replace('/\s+/', '', $to), '+');
         [$shortMessage, $dataCoding, $srcTon] = $this->encode($message, $from);
 
+        // Too long for one SMS → split into concatenated parts (UDH). GSM single =
+        // 160 septets (=bytes, unpacked); UCS2 single = 140 octets (70 chars).
+        $singleLimit = ($dataCoding === 0x08) ? 140 : 160;
+        if (strlen($shortMessage) > $singleLimit) {
+            return $this->sendConcatenated($to, $shortMessage, $dataCoding, $srcTon, $from);
+        }
+
         // submit_sm body (SMPP 3.4)
         $body  = "\x00";                                  // service_type (empty)
         $body .= pack('C', $srcTon);                      // source_addr_ton
@@ -283,6 +297,9 @@ class SmppService
         $body .= pack('C', 0x00);                         // sm_default_msg_id
         $body .= pack('C', strlen($shortMessage));        // sm_length
         $body .= $shortMessage;                           // short_message
+        // Ask Vonage to return pricing: TLV 0x1421=0x31 → submit_sm_resp carries the
+        // per-SMS price in TLV 0x1422 (and balance 0x1423). Same as sms_expert.
+        $body .= pack('nnC', 0x1421, 1, 0x31);
 
         $seq = $this->nextSequenceNumber();
         $this->sendPDU($this->buildPDU(self::SUBMIT_SM, $body, 0, $seq));
@@ -298,7 +315,134 @@ class SmppService
             throw new Exception('submit_sm rejected — status 0x' . sprintf('%08X', $resp['command_status']));
         }
 
-        return $this->parseMessageId($resp['body']);
+        $this->lastSubmissionPrice = $this->parseSubmissionPrice($resp['body']);
+        $messageId = $this->parseMessageId($resp['body']);
+        \App\Services\Logging\ComponentLogger::smpp()->info('SUBMIT_SM ok', [
+            'to' => $to, 'from' => $from, 'id' => $messageId,
+            'dc' => $dataCoding, 'parts' => 1, 'price' => $this->lastSubmissionPrice,
+        ]);
+        return $messageId;
+    }
+
+    /** Vonage per-SMS price (TLV 0x1422) from the last submit_sm_resp, or null. */
+    public function getLastPrice(): ?string
+    {
+        return $this->lastSubmissionPrice;
+    }
+
+    /**
+     * Send a long message as concatenated SMS (multiple submit_sm with a UDH so the
+     * handset reassembles them). Returns the LAST part's message-id (used for DLR
+     * matching — same as sms_expert); lastSubmissionPrice = sum of the parts' prices.
+     */
+    private function sendConcatenated(string $to, string $encoded, int $dataCoding, int $srcTon, string $from): string
+    {
+        $parts = $this->splitEncoded($encoded, $dataCoding);
+        $total = count($parts);
+        $ref   = $this->getConcatRef();
+
+        $lastId   = '';
+        $priceSum = 0.0;
+        $anyPrice = false;
+
+        foreach ($parts as $i => $part) {
+            $partNum = $i + 1;
+            $payload = $this->generateUDH($ref, $total, $partNum) . $part;
+
+            $body  = "\x00";                              // service_type
+            $body .= pack('C', $srcTon);                  // source_addr_ton
+            $body .= pack('C', 0x00);                     // source_addr_npi
+            $body .= $from . "\x00";                      // source_addr
+            $body .= pack('C', 0x01);                     // dest_addr_ton
+            $body .= pack('C', 0x01);                     // dest_addr_npi
+            $body .= $to . "\x00";                        // destination_addr
+            $body .= pack('C', 0x40);                     // esm_class = UDHI (UDH present)
+            $body .= pack('C', 0x00);                     // protocol_id
+            $body .= pack('C', 0x00);                     // priority_flag
+            $body .= "\x00";                              // schedule_delivery_time
+            $body .= "\x00";                              // validity_period
+            $body .= pack('C', 0x01);                     // registered_delivery = 1
+            $body .= pack('C', 0x00);                     // replace_if_present
+            $body .= pack('C', $dataCoding);              // data_coding
+            $body .= pack('C', 0x00);                     // sm_default_msg_id
+            $body .= pack('C', strlen($payload));         // sm_length (UDH + content)
+            $body .= $payload;                            // short_message
+            $body .= pack('nnC', 0x1421, 1, 0x31);        // request Vonage pricing
+
+            $this->sendPDU($this->buildPDU(self::SUBMIT_SM, $body, 0, $this->nextSequenceNumber()));
+
+            $resp = $this->readPDU(true);
+            if (!$resp || $resp['command_id'] !== self::SUBMIT_SM_RESP) {
+                throw new Exception("No submit_sm response for part {$partNum}/{$total}");
+            }
+            if ($resp['command_status'] !== self::ESME_ROK) {
+                throw new Exception("Part {$partNum}/{$total} rejected — status 0x" . sprintf('%08X', $resp['command_status']));
+            }
+
+            $lastId = $this->parseMessageId($resp['body']); // keep the last part's id (DLR match)
+            $price = $this->parseSubmissionPrice($resp['body']);
+            if ($price !== null) {
+                $priceSum += (float) $price;
+                $anyPrice = true;
+            }
+        }
+
+        $this->lastSubmissionPrice = $anyPrice ? number_format($priceSum, 5, '.', '') : null;
+        \App\Services\Logging\ComponentLogger::smpp()->info('SUBMIT_SM ok (concatenated)', [
+            'to' => $to, 'from' => $from, 'id' => $lastId,
+            'dc' => $dataCoding, 'parts' => $total, 'price' => $this->lastSubmissionPrice,
+        ]);
+        return $lastId;
+    }
+
+    /**
+     * Split an already-encoded message into concatenated-SMS parts.
+     *   UCS2 : 132 octets/part (byte split — never overflows, emoji-safe).
+     *   GSM  : 153 septets/part (unpacked = 1 byte/septet); never end a part on a
+     *          lone 0x1B escape (would split an extended char across parts).
+     */
+    private function splitEncoded(string $encoded, int $dataCoding): array
+    {
+        if ($dataCoding === 0x08) {
+            return str_split($encoded, 132);
+        }
+
+        $parts = [];
+        $len = strlen($encoded);
+        $pos = 0;
+        while ($pos < $len) {
+            $take = min(153, $len - $pos);
+            if ($take === 153 && $encoded[$pos + $take - 1] === "\x1B") {
+                $take--; // push the escape (and its following char) into the next part
+            }
+            $parts[] = substr($encoded, $pos, $take);
+            $pos += $take;
+        }
+        return $parts ?: [''];
+    }
+
+    /** 6-byte UDH for concatenated SMS: 05 00 03 <ref> <total> <part>. */
+    private function generateUDH(int $ref, int $total, int $part): string
+    {
+        return pack('CCCCCC', 0x05, 0x00, 0x03, $ref & 0xFF, $total, $part);
+    }
+
+    /**
+     * Unique concat reference (0-255), partitioned per worker (6-value slice keyed
+     * off bankKey) so parallel senders never collide on the same phone. Mirrors
+     * sms_expert's getConcatReferenceNumber.
+     */
+    private function getConcatRef(): int
+    {
+        $slotSize = 6;
+        $slots = intdiv(256, $slotSize);
+        if ($this->concatRefSlotBase === null) {
+            $workerIndex = crc32((string) ($this->bankKey ?? $this->seqMin)) % $slots;
+            $this->concatRefSlotBase = $workerIndex * $slotSize;
+        }
+        $ref = $this->concatRefSlotBase + ($this->concatRefCounter % $slotSize);
+        $this->concatRefCounter++;
+        return $ref;
     }
 
     public function close(): void
@@ -418,6 +562,31 @@ class SmppService
         return $nullPos !== false ? substr($body, 0, $nullPos) : $body;
     }
 
+    /**
+     * Extract the Vonage per-SMS price from a submit_sm_resp body: skip the
+     * message-id C-string, then scan TLVs for 0x1422 (price, an ASCII string).
+     */
+    private function parseSubmissionPrice(string $body): ?string
+    {
+        $nullPos = strpos($body, "\x00");
+        if ($nullPos === false) {
+            return null;
+        }
+        $pos = $nullPos + 1;
+        $len = strlen($body);
+        while ($pos + 4 <= $len) {
+            $tag = unpack('n', substr($body, $pos, 2))[1]; $pos += 2;
+            $tlvLen = unpack('n', substr($body, $pos, 2))[1]; $pos += 2;
+            if ($tlvLen < 0 || $pos + $tlvLen > $len) break;
+            $value = substr($body, $pos, $tlvLen); $pos += $tlvLen;
+            if ($tag === 0x1422) {
+                $price = trim($value);
+                return $price === '' ? null : $price;
+            }
+        }
+        return null;
+    }
+
     private function nextSequenceNumber(): int
     {
         $this->sequenceNumber++;
@@ -449,7 +618,8 @@ class SmppService
         if (mb_check_encoding($message, 'ASCII')) {
             return [GsmEncoder::utf8_to_gsm0338($message), 0x00, $srcTon];
         }
-        return [mb_convert_encoding($message, 'UCS-2BE', 'UTF-8'), 0x08, $srcTon];
+        // UTF-16BE (not UCS-2BE) so emoji / non-BMP characters encode as surrogate pairs.
+        return [mb_convert_encoding($message, 'UTF-16BE', 'UTF-8'), 0x08, $srcTon];
     }
 
     public static function messageIdToDecimal(string $messageId): string

@@ -24,8 +24,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        // Delete date-bucketed log folders older than 14 days (matches sms_expert).
+        $schedule->command('logs:cleanup --days=14')->dailyAt('02:30');
     }
 
     /**

@@ -22,23 +22,48 @@ class RabbitMQService
         if ($this->connection && $this->connection->isConnected()) {
             return;
         }
-        $this->connection = new AMQPStreamConnection(
-            config('rabbitmq.host', 'rabbitmq'),
-            (int) config('rabbitmq.port', 5672),
-            config('rabbitmq.user', 'guest'),
-            config('rabbitmq.password', 'guest'),
-            config('rabbitmq.vhost', '/'),
-            false,
-            'AMQPLAIN',
-            null,
-            'en_US',
-            3.0,
-            3.0,
-            null,
-            false,
-            (int) config('rabbitmq.heartbeat', 30)
-        );
-        $this->channel = $this->connection->channel();
+
+        // Retry so a not-yet-ready broker (e.g. RabbitMQ still booting after
+        // `docker-compose up`) is waited out instead of crashing the worker and
+        // firing a false crash-alert. Only throws after ~retries×delay seconds.
+        $retries = max(1, (int) config('rabbitmq.connect_retries', 10));
+        $delay   = max(1, (int) config('rabbitmq.connect_retry_delay', 3));
+        $lastError = null;
+
+        for ($attempt = 1; $attempt <= $retries; $attempt++) {
+            try {
+                $this->connection = new AMQPStreamConnection(
+                    config('rabbitmq.host', 'rabbitmq'),
+                    (int) config('rabbitmq.port', 5672),
+                    config('rabbitmq.user', 'guest'),
+                    config('rabbitmq.password', 'guest'),
+                    config('rabbitmq.vhost', '/'),
+                    false,
+                    'AMQPLAIN',
+                    null,
+                    'en_US',
+                    3.0,
+                    3.0,
+                    null,
+                    false,
+                    (int) config('rabbitmq.heartbeat', 30)
+                );
+                $this->channel = $this->connection->channel();
+                return;
+            } catch (\Throwable $e) {
+                $lastError = $e;
+                if ($attempt < $retries) {
+                    \Illuminate\Support\Facades\Log::warning(
+                        "RabbitMQ not ready (attempt {$attempt}/{$retries}) — retrying in {$delay}s: " . $e->getMessage()
+                    );
+                    sleep($delay);
+                }
+            }
+        }
+
+        // Broker genuinely unreachable after all retries — let it bubble
+        // (supervisor restarts the worker; a sustained outage is alert-worthy).
+        throw $lastError;
     }
 
     private function declareQueue(string $queue): void
@@ -71,6 +96,12 @@ class RabbitMQService
             'content_type'  => 'application/json',
         ]);
         $this->channel->basic_publish($msg, '', $queue);
+
+        \App\Services\Logging\ComponentLogger::rabbitmq($queue)->info('PUBLISH', [
+            'to'   => $data['to'] ?? null,
+            'from' => $data['from'] ?? null,
+            'ref'  => $data['message_update_id'] ?? null,
+        ]);
         return true;
     }
 
@@ -89,22 +120,27 @@ class RabbitMQService
 
         $this->channel->basic_consume($queue, $consumerTag, false, false, false, false, function (AMQPMessage $message) use ($callback, $maxMessages, &$processed, $consumerTag) {
             $data = json_decode($message->getBody(), true);
+            $log = \App\Services\Logging\ComponentLogger::rabbitmq($queue);
             $ok = false;
             if (is_array($data)) {
                 try {
                     $ok = (bool) $callback($data);
                 } catch (\Throwable $e) {
                     $ok = false;
+                    $log->error('CONSUME exception', ['error' => $e->getMessage()]);
                 }
             } else {
                 // unparseable body — ack to drop it (don't loop forever)
                 $ok = true;
+                $log->warning('CONSUME unparseable body — dropped');
             }
 
             if ($ok) {
                 $message->ack();
+                $log->info('ACK', ['to' => $data['to'] ?? null, 'ref' => $data['message_update_id'] ?? null]);
             } else {
                 $message->nack(true); // requeue
+                $log->warning('NACK — requeued', ['to' => $data['to'] ?? null]);
             }
 
             $processed++;

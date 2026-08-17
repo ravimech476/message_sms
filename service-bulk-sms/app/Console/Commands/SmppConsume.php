@@ -47,15 +47,17 @@ class SmppConsume extends Command
             try {
                 $smpp->connect();
                 $messageId = $smpp->sendSms($to, $message, $from);
+                $price = $smpp->getLastPrice();
                 $smpp->close();
 
                 if ($updateId) {
                     MessageUpdate::where('id', $updateId)->update([
                         'status'              => 'sent',
                         'supplier_message_id' => $messageId,
+                        'cost_per_sms'        => $price,
                     ]);
                 }
-                $this->info("  ✅ sent — message_id={$messageId}");
+                $this->info("  ✅ sent — message_id={$messageId} cost={$price}");
                 return true; // ack
             } catch (\Throwable $e) {
                 $smpp->close();

@@ -7,7 +7,9 @@
             return ['Delivered', 'bg-green-100 text-green-800'];
         }
         if ($row->status === 'failed') {
-            return ['Failed', 'bg-red-100 text-red-800'];
+            // A delivery-receipt non-delivery vs a send-time failure.
+            $label = $row->status_note && stripos($row->status_note, 'Non Delivered') !== false ? 'Non Delivered' : 'Failed';
+            return [$label, 'bg-red-100 text-red-800'];
         }
         if ($row->status === 'sent') {
             return ['Sent', 'bg-cyan-100 text-cyan-800'];
@@ -27,8 +29,10 @@
                 <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase">Practice</th>
                 <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase">Provider</th>
                 <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase">Recipient</th>
-                <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase w-32">Status</th>
-                <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase">Delivered</th>
+                {{-- Hidden in UI (data still stored in message_updates: status/delivered_at/cost_per_sms) --}}
+                {{-- <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase w-32">Status</th> --}}
+                {{-- <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase">Delivered</th> --}}
+                {{-- <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase">Cost</th> --}}
                 <th class="bg-gray-200 px-4 py-2 font-medium tracking-wider text-left text-xs uppercase">Message ID</th>
             </tr>
         @foreach ($messages as $row)
@@ -38,13 +42,15 @@
                 <td class="border px-4 py-3">{{ $row->message->provider->domain->domain }}</td>
                 <td class="border px-4 py-3">{{ $row->message->provider->provider['name'] }}</td>
                 <td class="border px-4 py-3">{{ strpos($row->message->provider->domain->domain, 'footfall') !== false ? $row->message->message_data->to : App\Support\Str::mask($row->message->message_data->to, '*', -10, 8) }}</td>
-                <td class="border px-4 py-3">
+                {{-- Status / Delivered / Cost hidden in UI (still stored in DB). To re-enable, uncomment these + their headers above. --}}
+                {{-- <td class="border px-4 py-3">
                     <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold {{ $classes }}">{{ $label }}</span>
-                    @if ($row->status === 'failed' && $row->status_note)
+                    @if ($row->status === 'failed' && $row->status_note && stripos($row->status_note, 'Non Delivered') === false)
                         <div class="text-xs text-red-500 mt-1">{{ $row->status_note }}</div>
                     @endif
                 </td>
                 <td class="border px-4 py-3 whitespace-nowrap">{{ $row->delivered_at ? $row->delivered_at->format('Y-m-d H:i:s') : '—' }}</td>
+                <td class="border px-4 py-3 whitespace-nowrap">{{ !is_null($row->cost_per_sms) ? number_format($row->cost_per_sms, 5) : '—' }}</td> --}}
                 <td class="border px-4 py-3 font-mono text-xs break-all text-gray-600">{{ $row->supplier_message_id ?: '—' }}</td>
             </tr>
         @endforeach

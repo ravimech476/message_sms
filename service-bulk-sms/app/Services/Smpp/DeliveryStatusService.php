@@ -34,13 +34,21 @@ class DeliveryStatusService
         $stat        = strtoupper((string) ($dlr['status'] ?? ''));
         $isDelivered = $this->delivered[$stat] ?? false;
 
-        $fields = [
-            'delivered_at' => now(),
-            'status_note'  => $isDelivered ? "Delivered ({$stat})" : "Non Delivered ({$stat})",
-        ];
-        // Only downgrade to failed on a real non-delivery; keep 'sent' when delivered
-        // (the UI renders "Delivered" from delivered_at being set).
-        $fields['status'] = $isDelivered ? 'sent' : 'failed';
+        if ($isDelivered) {
+            // Actually delivered → keep status 'sent', stamp delivered_at (UI shows "Delivered").
+            $fields = [
+                'status'       => 'sent',
+                'status_note'  => "Delivered ({$stat})",
+                'delivered_at' => now(),
+            ];
+        } else {
+            // Non-delivered → status 'failed', leave delivered_at NULL so it never
+            // shows as delivered. The note carries the exact reason.
+            $fields = [
+                'status'      => 'failed',
+                'status_note' => "Non Delivered ({$stat})",
+            ];
+        }
 
         return MessageUpdate::where('supplier_message_id', $msgId)->update($fields) > 0;
     }

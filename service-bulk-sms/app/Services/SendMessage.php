@@ -137,13 +137,14 @@ class SendMessage
         try {
             $smpp->connect();
             $messageId = $smpp->sendSms($to, $message, $from);
+            $price = $smpp->getLastPrice();
             $smpp->close();
         } catch (Exception $e) {
             $smpp->close();
             throw $e; // outer catch records the MessageUpdate 'failed' + email fallback
         }
 
-        $this->updateMessage('sent', "SMPP message_id: {$messageId}", 'sms', $messageId);
+        $this->updateMessage('sent', "SMPP message_id: {$messageId}", 'sms', $messageId, $price);
     }
 
     /**
@@ -171,13 +172,14 @@ class SendMessage
      * @param string $messageType
      * @return mixed
      */
-    protected function updateMessage(string $status, $statusNote = null, $messageType = 'sms', $supplierMessageId = null)
+    protected function updateMessage(string $status, $statusNote = null, $messageType = 'sms', $supplierMessageId = null, $costPerSms = null)
     {
         $update = new MessageUpdate([
             'delivery_type'       => $messageType,
             'status'              => $status,
             'status_note'         => $statusNote,
             'supplier_message_id' => $supplierMessageId,
+            'cost_per_sms'        => $costPerSms,
         ]);
 
         return $this->message->updates()->save($update);

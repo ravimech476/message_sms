@@ -37,6 +37,14 @@ class Handler extends ExceptionHandler
     public function report(Exception $exception)
     {
         parent::report($exception);
+
+        // Email the admin on unhandled exceptions (throttled). Never let an
+        // alerting failure break the app's own error handling.
+        try {
+            app(\App\Services\AdminAlertService::class)->notifyException($exception);
+        } catch (\Throwable $e) {
+            // swallow
+        }
     }
 
     /**

@@ -12,6 +12,7 @@ class MessageUpdate extends Model
       'status',
       'status_note',
       'supplier_message_id',
+      'cost_per_sms',
       'delivered_at',
     ];
 
