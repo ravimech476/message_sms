@@ -9,6 +9,8 @@ use Illuminate\Console\Command;
  * --days. Mirrors sms_expert's log retention. Scheduled daily; also runnable by hand.
  *
  *   php artisan logs:cleanup --days=14
+ *
+ * @author Anand Karthik
  */
 class CleanupLogs extends Command
 {

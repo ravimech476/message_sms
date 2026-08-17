@@ -11,6 +11,9 @@ use App\Services\Smpp\SmppService;
 use Exception;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * @author Anand Karthik (modified — routes Vonage sends through the SMPP pipeline)
+ */
 class SendMessage
 {
     /**

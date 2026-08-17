@@ -1,0 +1,181 @@
+project: service-bulk-sms (FootFall Bulk SMS)
+date: 2026-08-17
+summary: >
+  Ported the SMPP + RabbitMQ + delivery-tracking SMS pipeline from the sms_expert
+  project into FootFall, replacing the old Vonage REST API sending. Adds multi-part
+  (concatenated) SMS, Vonage per-SMS price capture, delivery tracking on the existing
+  message_updates table, per-component date-bucketed logging with retention,
+  app-wide crash-email alerts, and a supervisor-managed 15-bind worker fleet.
+
+# ---------------------------------------------------------------------------
+# 1. PACKAGES INSTALLED (composer.json)
+# ---------------------------------------------------------------------------
+packages_installed:
+  php_version: "^7.4 || ^8.0   (upgraded from 7.2)"
+  php_extensions:
+    - ext-sockets   # raw SMPP socket connection
+    - ext-json
+  composer_require:
+    - name: php-amqplib/php-amqplib
+      version: "^3.5"
+      purpose: RabbitMQ / AMQP client (publish + consume sms.outbound)
+    - name: php-smpp/php-smpp
+      version: "^1.0"
+      purpose: provides the GsmEncoder class (GSM 03.38 encoding for SMPP)
+    - name: predis/predis
+      version: "^2.0"
+      purpose: Redis client
+  note: >
+    defuse/php-encryption, laravel/framework, fideloper/proxy and vonage/client
+    were already present. Run `composer update` in the php container after pulling.
+
+# ---------------------------------------------------------------------------
+# 2. INFRASTRUCTURE / DOCKER
+# ---------------------------------------------------------------------------
+infrastructure:
+  - file: docker/php/Dockerfile
+    change: modified
+    note: Alpine PHP 8 + php8-sockets/pcntl/posix; `ln -s php8 php`
+  - file: docker-compose.yml
+    change: modified
+    note: >
+      added services - rabbitmq (3.13-management, host 5673/15673),
+      worker (php artisan queue:work), and smpp-workers (supervisor: 15 binders)
+  - file: docker/supervisor/supervisord.conf
+    change: created
+    note: supervisor master config (nodaemon + supervisorctl socket)
+  - file: docker/supervisor/sms-workers.conf
+    change: created
+    note: 5 senders (smpp:consume) + 10 DLR banks (smpp:dlr-receiver a0..j0) + scheduler
+
+# ---------------------------------------------------------------------------
+# 3. CONFIG
+# ---------------------------------------------------------------------------
+config:
+  - file: config/smpp.php
+    change: created
+    note: SMPP host/port/system_id/type from env
+  - file: config/smpp_banks.php
+    change: created
+    note: 10 banks a0..j0 across 3 Vonage EU hosts, partitioned seq_id ranges
+  - file: config/rabbitmq.php
+    change: created
+    note: RabbitMQ host/port/creds, queue names, connect-retry settings
+  - file: config/messages.php
+    change: modified
+    note: added 'smpp_async' toggle (RabbitMQ pipeline vs inline send)
+  - file: config/alert.php
+    change: created
+    note: crash-email alert settings (enabled / email / throttle_minutes)
+  - file: config/logging.php
+    change: modified
+    note: main laravel.log now date-bucketed (logs/{date}/laravel.log)
+  - file: .env
+    change: modified
+    note: >
+      SMPP block (host/system_id/password/type, banks), RabbitMQ block,
+      SMTP mail (smtp.gmail.com), ADMIN_ALERT_* crash-alert vars
+
+# ---------------------------------------------------------------------------
+# 4. DATABASE MIGRATIONS
+# ---------------------------------------------------------------------------
+migrations:
+  created:
+    - database/migrations/2026_08_15_000010_add_delivery_tracking_to_message_updates.php  # +supplier_message_id (indexed), +delivered_at
+    - database/migrations/2026_08_15_000011_drop_smsg_log_tables.php                       # drop smsg_log + smsg_receipt_buffer_new
+    - database/migrations/2026_08_17_000001_add_cost_per_sms_to_message_updates.php        # +cost_per_sms (Vonage price)
+  deleted:
+    - database/migrations/2026_08_14_000001_create_smsg_log_table.php
+    - database/migrations/2026_08_14_000002_create_smsg_receipt_buffer_new_table.php
+
+# ---------------------------------------------------------------------------
+# 5. SERVICES
+# ---------------------------------------------------------------------------
+services:
+  created:
+    - file: app/Services/Smpp/SmppService.php
+      note: raw-socket SMPP client - bind, submit_sm, multi-part/UDH, DLR parse, Vonage price TLV
+    - file: app/Services/Smpp/DeliveryStatusService.php
+      note: applies a DLR to message_updates (delivered_at + status)
+    - file: app/Services/Queue/RabbitMQService.php
+      note: publish/consume sms.outbound; connection retry for startup race
+    - file: app/Services/Logging/ComponentLogger.php
+      note: per-component date-bucketed logs (smpp/rabbitmq/api)
+    - file: app/Services/AdminAlertService.php
+      note: throttled crash-email on unhandled exceptions
+  modified:
+    - file: app/Services/SendMessage.php
+      note: routes Vonage sends through SMPP (queue or inline) instead of REST
+
+# ---------------------------------------------------------------------------
+# 6. CONSOLE COMMANDS
+# ---------------------------------------------------------------------------
+commands:
+  created:
+    - app/Console/Commands/SmppConsume.php       # smpp:consume  (sender - drains sms.outbound)
+    - app/Console/Commands/SmppDlrReceiver.php   # smpp:dlr-receiver --bank=  (DLR receiver)
+    - app/Console/Commands/SmppTestBind.php      # smpp:test-bind  (bind smoke test)
+    - app/Console/Commands/CleanupLogs.php       # logs:cleanup --days=14  (log retention)
+  modified:
+    - app/Console/Kernel.php                     # schedule logs:cleanup daily 02:30
+  deleted:
+    - app/Console/Commands/ProcessDlrBuffer.php  # (buffer table removed)
+    - app/Console/Commands/SmsQueue.php          # (smsg_log test helper)
+    - app/Console/Commands/SmppSend.php          # (smsg_log test helper)
+
+# ---------------------------------------------------------------------------
+# 7. MODELS
+# ---------------------------------------------------------------------------
+models:
+  modified:
+    - file: app/Models/MessageUpdate.php
+      note: fillable += supplier_message_id, cost_per_sms, delivered_at; cast delivered_at
+    - file: app/Models/Credential.php
+      note: getValueAttribute now try/catch - a bad credential no longer 500s the page
+
+# ---------------------------------------------------------------------------
+# 8. CONTROLLERS / EXCEPTIONS
+# ---------------------------------------------------------------------------
+http:
+  modified:
+    - file: app/Http/Controllers/Api/MessagesController.php
+      note: logs each POST /api/v1/messages to api/requests.log
+    - file: app/Exceptions/Handler.php
+      note: report() now sends the crash-alert email via AdminAlertService
+  deleted:
+    - app/Http/Controllers/Admin/SmsLogController.php   # SMS Log page removed (merged into Sent Messages)
+
+# ---------------------------------------------------------------------------
+# 9. VIEWS / ROUTES
+# ---------------------------------------------------------------------------
+frontend:
+  modified:
+    - file: resources/views/admin/messages/index.blade.php
+      note: Sent Messages page + Message ID column; Status/Delivered/Cost columns hidden (data still stored)
+  deleted:
+    - resources/views/admin/sms_log/index.blade.php     # SMS Log page removed
+  unchanged_net:
+    - routes/web.php                # /sms-log route was added then removed
+    - resources/views/_layouts/default.blade.php  # SMS Log nav link added then removed
+
+# ---------------------------------------------------------------------------
+# 10. RUNTIME (how to run)
+# ---------------------------------------------------------------------------
+runtime:
+  start_all: docker-compose up -d        # starts app + mysql + rabbitmq + workers + 15 binders
+  stop_all: docker-compose down
+  worker_restart_after_code_change: docker restart silicon-sms-worker silicon-sms-smpp-workers
+  rabbitmq_dashboard: http://localhost:15673   # guest/guest
+  binder_status: docker exec silicon-sms-smpp-workers sh -c 'supervisorctl -c /app/docker/supervisor/supervisord.conf status'
+  logs: storage/logs/{YYYY-MM-DD}/{laravel.log, smpp/vonage.log, rabbitmq/*.log, api/requests.log}
+
+# ---------------------------------------------------------------------------
+# 11. KEY BEHAVIOUR NOTES FOR THE TEAM
+# ---------------------------------------------------------------------------
+notes:
+  - Delivery data lives on message_updates (supplier_message_id, delivered_at, cost_per_sms) - smsg_log was dropped.
+  - Sending uses ONE shared Vonage SMPP account (SMPP_SYSTEM_ID) for all practices, not per-practice REST keys.
+  - Long messages auto-split into concatenated parts; cost_per_sms is the sum of the parts' Vonage prices.
+  - Multi-part DLR matches on the LAST part's message-id.
+  - Workers cache code in memory - ALWAYS restart them after changing worker/service code.
+  - SMPP reconnects are logged (not emailed); crash-alert emails fire only on genuine unhandled exceptions.

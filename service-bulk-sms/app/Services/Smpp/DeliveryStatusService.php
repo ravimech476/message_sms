@@ -11,6 +11,8 @@ use App\Models\MessageUpdate;
  * The status enum stays pending|sent|failed (no schema change): a delivered receipt
  * sets delivered_at (the UI shows "Delivered" from that), a non-delivered one sets
  * status = failed. Ported status map from sms_expert's DeliveryStatusService.
+ *
+ * @author Anand Karthik
  */
 class DeliveryStatusService
 {

@@ -14,6 +14,8 @@ use Throwable;
  * (web, queue, console, workers). Throttled per unique error so a crash loop
  * can't flood the inbox. All mail errors are swallowed so alerting can never
  * break the app's own error handling.
+ *
+ * @author Anand Karthik
  */
 class AdminAlertService
 {

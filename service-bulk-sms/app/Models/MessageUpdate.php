@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @author Anand Karthik (modified — delivery-tracking columns: supplier_message_id, delivered_at, cost_per_sms)
+ */
 class MessageUpdate extends Model
 {
     protected $fillable = [

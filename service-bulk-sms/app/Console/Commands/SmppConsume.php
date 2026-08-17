@@ -13,6 +13,8 @@ use Illuminate\Console\Command;
  * stamps message_updates.supplier_message_id so the DLR can match back.
  *
  *   docker exec silicon-sms-smpp-workers php artisan smpp:consume
+ *
+ * @author Anand Karthik
  */
 class SmppConsume extends Command
 {

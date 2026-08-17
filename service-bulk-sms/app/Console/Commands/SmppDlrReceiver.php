@@ -13,6 +13,8 @@ use Illuminate\Console\Command;
  *
  *   docker exec silicon-sms-smpp-workers php artisan smpp:dlr-receiver --bank=a0
  *   docker exec silicon-sms-smpp-workers php artisan smpp:dlr-receiver --seconds=60   # testing
+ *
+ * @author Anand Karthik
  */
 class SmppDlrReceiver extends Command
 {

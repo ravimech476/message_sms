@@ -6,6 +6,9 @@ use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @author Anand Karthik (modified — tolerant decrypt: a bad credential no longer 500s the page)
+ */
 class Credential extends Model
 {
     protected $connection = 'mysql';

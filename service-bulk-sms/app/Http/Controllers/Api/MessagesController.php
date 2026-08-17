@@ -9,6 +9,9 @@ use App\Http\Resources\MessageResource;
 use App\Jobs\ProcessMessage;
 use App\Models\Message;
 
+/**
+ * @author Anand Karthik (modified — logs each send request to api/requests.log)
+ */
 class MessagesController extends Controller
 {
     /**

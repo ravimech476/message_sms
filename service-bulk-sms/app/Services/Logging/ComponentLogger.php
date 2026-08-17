@@ -13,6 +13,8 @@ namespace App\Services\Logging;
  *   ComponentLogger::smpp()->info('bind OK', ['host' => $h]);
  *   ComponentLogger::rabbitmq('sms.outbound')->info('published', [...]);
  *   ComponentLogger::api()->info('send request', [...]);
+ *
+ * @author Anand Karthik
  */
 class ComponentLogger
 {

@@ -14,6 +14,8 @@ use GsmEncoder;
  * php-smpp's GsmEncoder is still reused for GSM 03.38 encoding.
  *
  * Bank-aware: pass a bank key from config/smpp_banks.php, or use the single-bind config.
+ *
+ * @author Anand Karthik
  */
 class SmppService
 {

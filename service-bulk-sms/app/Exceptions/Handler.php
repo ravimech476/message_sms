@@ -5,6 +5,9 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
+/**
+ * @author Anand Karthik (modified — sends throttled crash-alert email via AdminAlertService)
+ */
 class Handler extends ExceptionHandler
 {
     /**

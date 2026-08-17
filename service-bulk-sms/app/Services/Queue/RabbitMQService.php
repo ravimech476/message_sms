@@ -10,6 +10,8 @@ use PhpAmqpLib\Message\AMQPMessage;
  *
  * Publishes outbound SMS to `sms.outbound` and DLRs to `sms.dlr`; long-running
  * consumers drain them. Uses php-amqplib against the `rabbitmq` docker service.
+ *
+ * @author Anand Karthik
  */
 class RabbitMQService
 {

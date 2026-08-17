@@ -5,6 +5,9 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
+/**
+ * @author Anand Karthik (modified — schedules logs:cleanup daily)
+ */
 class Kernel extends ConsoleKernel
 {
     /**
