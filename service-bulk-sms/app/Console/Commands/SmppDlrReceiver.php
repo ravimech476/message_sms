@@ -41,16 +41,29 @@ class SmppDlrReceiver extends Command
 
         $matched = 0;
         $seen = 0;
-        $smpp->listenForDlr(function (array $dlr) use (&$matched, &$seen, $status) {
-            $seen++;
-            $ok = $status->apply($dlr);
-            $ok ? $matched++ : null;
-            $this->line("  ← DLR id={$dlr['message_id']} stat={$dlr['status']} " . ($ok ? 'matched' : 'no-match'));
-            \App\Services\Logging\ComponentLogger::smpp()->info('DLR received', [
-                'id' => $dlr['message_id'] ?? null, 'status' => $dlr['status'] ?? null,
-                'matched' => $ok, 'bank' => $this->option('bank'),
+        try {
+            $smpp->listenForDlr(function (array $dlr) use (&$matched, &$seen, $status) {
+                $seen++;
+                $ok = $status->apply($dlr);
+                $ok ? $matched++ : null;
+                $this->line("  ← DLR id={$dlr['message_id']} stat={$dlr['status']} " . ($ok ? 'matched' : 'no-match'));
+                \App\Services\Logging\ComponentLogger::smpp()->info('DLR received', [
+                    'id' => $dlr['message_id'] ?? null, 'status' => $dlr['status'] ?? null,
+                    'matched' => $ok, 'bank' => $this->option('bank'),
+                ]);
+            }, $seconds);
+        } catch (\Throwable $e) {
+            // A dropped SMPP link is normal churn (Vonage closes idle binds; supervisor
+            // reconnects). Log it and exit cleanly so it does NOT reach the crash-alert
+            // email — only genuine, unexpected failures should page the admin.
+            \App\Services\Logging\ComponentLogger::smpp()->warning('receiver connection lost — will reconnect', [
+                'bank'  => $this->option('bank'),
+                'error' => $e->getMessage(),
             ]);
-        }, $seconds);
+            $smpp->close();
+            $this->warn('Connection lost — exiting for supervisor to restart: ' . $e->getMessage());
+            return 0; // clean exit → no crash email
+        }
 
         $smpp->close();
         $this->info("Receiver stopped. Saw {$seen} DLR(s), matched {$matched}.");
