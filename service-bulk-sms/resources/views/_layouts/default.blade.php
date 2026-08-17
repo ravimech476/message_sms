@@ -19,7 +19,6 @@
                             <ul class="list-none flex">
                                 <li class="mx-3"><a href="{{ route('practices') }}" class="font-semibold text-white hover:underline">{{ __('Practices') }}</a></li>
                                 <li class="mx-3"><a href="{{ route('messages') }}" class="font-semibold text-white hover:underline">{{ __('Sent Messages') }}</a></li>
-                                <li class="mx-3"><a href="{{ route('sms-log') }}" class="font-semibold text-white hover:underline">{{ __('SMS Log') }}</a></li>
                             </ul>
                         </div>
                         <div class="text-gray-400 text-sm">

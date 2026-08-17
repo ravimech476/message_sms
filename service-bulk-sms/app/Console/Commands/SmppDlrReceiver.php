@@ -2,18 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Smpp\DeliveryStatusService;
 use App\Services\Smpp\SmppService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 /**
- * Phase 4 — DLR receiver: bind_receiver on a bank, read deliver_sm delivery
- * receipts, and buffer each into smsg_receipt_buffer_new (XMLDATA=JSON, status='new').
- * A separate `dlr:process-buffer` worker matches them back to smsg_log.
- * Mirrors sms_expert's SMPP receiver + smsg_receipt_buffer_new write.
+ * DLR receiver: bind_receiver on a bank, read deliver_sm delivery receipts, and
+ * apply each directly to message_updates (match supplier_message_id → set
+ * delivered_at + status). No buffer table — the update is a fast indexed seek.
  *
- *   docker exec silicon-sms-php php artisan smpp:dlr-receiver
- *   docker exec silicon-sms-php php artisan smpp:dlr-receiver --seconds=60   # testing
+ *   docker exec silicon-sms-smpp-workers php artisan smpp:dlr-receiver --bank=a0
+ *   docker exec silicon-sms-smpp-workers php artisan smpp:dlr-receiver --seconds=60   # testing
  */
 class SmppDlrReceiver extends Command
 {
@@ -21,9 +20,9 @@ class SmppDlrReceiver extends Command
         {--bank= : Bank key from config/smpp_banks.php}
         {--seconds=0 : Run for N seconds then exit (0 = forever)}';
 
-    protected $description = 'Bind as SMPP receiver and buffer delivery receipts (DLRs) into smsg_receipt_buffer_new';
+    protected $description = 'Bind as SMPP receiver and apply delivery receipts (DLRs) to message_updates';
 
-    public function handle()
+    public function handle(DeliveryStatusService $status)
     {
         $bank = $this->option('bank') ?: null;
         $seconds = (int) $this->option('seconds');
@@ -40,23 +39,17 @@ class SmppDlrReceiver extends Command
 
         $this->info('bound_receiver — listening for DLRs' . ($seconds > 0 ? " for {$seconds}s" : ' (Ctrl+C to stop)') . ' ...');
 
-        $count = 0;
-        $smpp->listenForDlr(function (array $dlr) use (&$count) {
-            DB::table('smsg_receipt_buffer_new')->insert([
-                'XMLDATA' => json_encode([
-                    'message_id' => $dlr['message_id'] ?? null,
-                    'status'     => $dlr['status'] ?? null,
-                    'done_date'  => $dlr['done_date'] ?? null,
-                    'err'        => $dlr['err'] ?? null,
-                ]),
-                'status' => 'new',
-            ]);
-            $count++;
-            $this->line("  ← DLR buffered: id={$dlr['message_id']} stat={$dlr['status']} err={$dlr['err']}");
+        $matched = 0;
+        $seen = 0;
+        $smpp->listenForDlr(function (array $dlr) use (&$matched, &$seen, $status) {
+            $seen++;
+            $ok = $status->apply($dlr);
+            $ok ? $matched++ : null;
+            $this->line("  ← DLR id={$dlr['message_id']} stat={$dlr['status']} " . ($ok ? 'matched' : 'no-match'));
         }, $seconds);
 
         $smpp->close();
-        $this->info("Receiver stopped. Buffered {$count} DLR(s).");
+        $this->info("Receiver stopped. Saw {$seen} DLR(s), matched {$matched}.");
         return 0;
     }
 }

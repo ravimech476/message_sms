@@ -2,18 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Models\MessageUpdate;
 use App\Services\Queue\RabbitMQService;
 use App\Services\Smpp\SmppService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 /**
- * Phase 3 — long-running consumer: pull SMS from sms.outbound and send via SMPP.
- * This is the production decoupling: the API/publisher never touches SMPP; this
- * worker does. Mirrors sms_expert's sms:process-queue.
+ * Long-running consumer: pull SMS from sms.outbound and send via SMPP.
+ * The API/publisher never touches SMPP; this binder does. After submitting, it
+ * stamps message_updates.supplier_message_id so the DLR can match back.
  *
- *   docker exec silicon-sms-php php artisan smpp:consume
- *   docker exec silicon-sms-php php artisan smpp:consume --once     # process one and exit (testing)
+ *   docker exec silicon-sms-smpp-workers php artisan smpp:consume
  */
 class SmppConsume extends Command
 {
@@ -32,7 +31,7 @@ class SmppConsume extends Command
         $this->info("SMPP consumer started — draining '{$queue}'" . ($bank ? " (bank {$bank})" : '') . ' ... Ctrl+C to stop.');
 
         $rabbit->consumeFromQueue($queue, function (array $data) use ($bank) {
-            $id = $data['smsg_log_id'] ?? null;
+            $updateId = $data['message_update_id'] ?? null;
             $to = $data['to'] ?? null;
             $from = $data['from'] ?? 'FootFall';
             $message = $data['message'] ?? '';
@@ -42,7 +41,7 @@ class SmppConsume extends Command
                 return true;
             }
 
-            $this->line("→ smsg_log #{$id}: sending to {$to} ...");
+            $this->line("→ message_update #{$updateId}: sending to {$to} ...");
 
             $smpp = new SmppService($bank);
             try {
@@ -50,22 +49,20 @@ class SmppConsume extends Command
                 $messageId = $smpp->sendSms($to, $message, $from);
                 $smpp->close();
 
-                if ($id) {
-                    DB::table('smsg_log')->where('id', $id)->update([
-                        'sentstatus'              => 'ok',
-                        'timesent'                => now()->format('YmdHis'),
-                        'deliveryreceipt1'        => $messageId,
-                        'onesixty_suppliermsgref' => $messageId,
+                if ($updateId) {
+                    MessageUpdate::where('id', $updateId)->update([
+                        'status'              => 'sent',
+                        'supplier_message_id' => $messageId,
                     ]);
                 }
                 $this->info("  ✅ sent — message_id={$messageId}");
                 return true; // ack
             } catch (\Throwable $e) {
                 $smpp->close();
-                if ($id) {
-                    DB::table('smsg_log')->where('id', $id)->update([
-                        'sentstatus'     => 'fail',
-                        'sentstatustext' => substr($e->getMessage(), 0, 250),
+                if ($updateId) {
+                    MessageUpdate::where('id', $updateId)->update([
+                        'status'      => 'failed',
+                        'status_note' => substr($e->getMessage(), 0, 250),
                     ]);
                 }
                 $this->error('  ❌ ' . $e->getMessage());

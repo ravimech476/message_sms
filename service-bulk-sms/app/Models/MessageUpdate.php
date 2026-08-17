@@ -11,6 +11,12 @@ class MessageUpdate extends Model
       'delivery_type',
       'status',
       'status_note',
+      'supplier_message_id',
+      'delivered_at',
+    ];
+
+    protected $casts = [
+      'delivered_at' => 'datetime',
     ];
 
     public function message()
